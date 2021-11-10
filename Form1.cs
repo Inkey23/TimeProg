@@ -20,19 +20,17 @@ namespace TimeProg
         }
 
         string PathRead = "0", InputFile = "0", PathWrite = "0";
-        double T = 0, S = 0, V = 0, A = 0, LastPosition = 0, FinalTime = 0;
+        double T = 0, S = 0, V = 0, A = 0, LastPosition1 = 0, LastPosition2 = 0, LastPosition3 = 0;
 
-        double TimeWait = 0, TimePos = 0, RealPosition, RealTime = 0;
-        List<double> Time = new List<double>();
-        
-        List<double> PointsY = new List<double>();
-        List<double> PointsX = new List<double>();
+        double AbsolutTime = 0, TimePos1 = 0, TimePos2 = 0, TimePos3 = 0, RealPosition1 = 0, RealPosition2 = 0, RealPosition3 = 0, RealTime1 = 0, RealTime2 = 0, RealTime3 = 0, NewPos = 0, J = 0;
+
         List<double> PointsX1 = new List<double>();
         List<double> PointsY1 = new List<double>();
         List<double> PointsX2 = new List<double>();
         List<double> PointsY2 = new List<double>();
         List<double> PointsX3 = new List<double>();
         List<double> PointsY3 = new List<double>();
+        List<double> Time = new List<double>();
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
@@ -67,68 +65,78 @@ namespace TimeProg
                             switch (FileSplit[i + 1])
                             {
                                 case "WAIT":
-                                    RealTime = TimeWait + TimePos;
-                                    TimeWait += Convert.ToDouble(FileSplit[i + 2]) / 1000;
-                                    while (RealTime < TimeWait)
+                                    RealTime1 = AbsolutTime + TimePos1;
+                                    RealTime2 = AbsolutTime + TimePos2;
+                                    RealTime3 = AbsolutTime + TimePos3;
+                                    AbsolutTime += Convert.ToDouble(FileSplit[i + 2]) / 1000;
+                                    while (RealTime1 < AbsolutTime)
                                     {
-                                        PointsX.Add(RealTime);
-                                        PointsY.Add(LastPosition);
-                                        RealTime++;
+                                        PointsX1.Add(RealTime1);
+                                        PointsY1.Add(LastPosition1);
+                                        RealTime1++;
                                     }
-                                    Time.Add(TimeWait);
+                                    while (RealTime2 < AbsolutTime)
+                                    {
+                                        PointsX2.Add(RealTime2);
+                                        PointsY2.Add(LastPosition2);
+                                        RealTime2++;
+                                    }
+                                    while (RealTime3 < AbsolutTime)
+                                    {
+                                        PointsX3.Add(RealTime3);
+                                        PointsY3.Add(LastPosition3);
+                                        RealTime3++;
+                                    }
                                     break;
                                 case "WAITPos":
-                                    RealTime = TimeWait + TimePos;
-                                    TimeWait += Convert.ToDouble(FileSplit[i + 4]) / 1000;
-                                    while (RealTime < TimeWait)
+                                    switch (FileSplit[i + 2])
                                     {
-                                        PointsX.Add(RealTime);
-                                        PointsY.Add(LastPosition);
-                                        RealTime++;
+                                        case "1":
+                                            RealTime1 = AbsolutTime + TimePos1;
+                                            AbsolutTime += (TimePos1 + Convert.ToDouble(FileSplit[i + 4]) / 1000);
+                                            while (RealTime1 < AbsolutTime)
+                                            {
+                                                PointsX1.Add(RealTime1);
+                                                PointsY1.Add(LastPosition1);
+                                                RealTime1++;
+                                            }
+                                            break;
+                                        case "2":
+                                            RealTime2 = AbsolutTime + TimePos2;
+                                            AbsolutTime += (TimePos2 + Convert.ToDouble(FileSplit[i + 4]) / 1000);
+                                            while (RealTime2 < AbsolutTime)
+                                            {
+                                                PointsX2.Add(RealTime2);
+                                                PointsY2.Add(LastPosition2);
+                                                RealTime2++;
+                                            }
+                                            break;
+                                        case "3":
+                                            RealTime3 = AbsolutTime + TimePos3;
+                                            AbsolutTime += (TimePos3 + Convert.ToDouble(FileSplit[i + 4]) / 1000);
+                                            while (RealTime3 < AbsolutTime)
+                                            {
+                                                PointsX3.Add(RealTime3);
+                                                PointsY3.Add(LastPosition3);
+                                                RealTime3++;
+                                            }
+                                            break;
                                     }
-                                    Time.Add(TimeWait);
                                     break;
                                 case "WAITRate":
-                                    RealTime = TimeWait + TimePos;
-                                    TimeWait += Convert.ToDouble(FileSplit[i + 4]) / 1000;
-                                    while (RealTime < TimeWait)
-                                    {
-                                        PointsX.Add(RealTime);
-                                        PointsY.Add(LastPosition);
-                                        RealTime++;
-                                    }
-                                    Time.Add(TimeWait);
+                                    
                                     break;
                                 case "WAITTemp":
-                                    RealTime = TimeWait + TimePos;
-                                    TimeWait += Convert.ToDouble(FileSplit[i + 4]) * 60;
-                                    while (RealTime < TimeWait)
-                                    {
-                                        PointsX.Add(RealTime);
-                                        PointsY.Add(LastPosition);
-                                        RealTime++;
-                                    }
-                                    Time.Add(TimeWait);
+                                    
                                     break;
                                 case "WAITGForce":
-                                    RealTime = TimeWait + TimePos;
-                                    TimeWait += Convert.ToDouble(FileSplit[i + 4]) * 60;
-                                    while (RealTime < TimeWait)
-                                    {
-                                        PointsX.Add(RealTime);
-                                        PointsY.Add(LastPosition);
-                                        RealTime++;
-                                    }
-                                    Time.Add(TimeWait);
+                                    
                                     break;
                                 case "Do":
-                                    Time.Add(TimeWait);
                                     break;
                                 case "LOOPUntil":
-                                    Time.Add(TimeWait);
                                     break;
                                 case "GOTO":
-                                    Time.Add(TimeWait);
                                     break;
                             }
                             break;
@@ -136,83 +144,192 @@ namespace TimeProg
                             switch (FileSplit[i + 1])
                             {
                                 case "POSition": // надо создать отдельный класс, где пропишу все команды, а то читать невозможно
-                                    S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition);
                                     V = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
                                     A = Math.Abs(Convert.ToDouble(FileSplit[i + 5]));
-                                    RealPosition = LastPosition;
-                                    LastPosition = Convert.ToDouble(FileSplit[i + 3]);
                                     switch (FileSplit[i + 2])
                                     {
                                         case "1":
+                                            S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition1);
+                                            RealPosition1 = LastPosition1;
+                                            LastPosition1 = Convert.ToDouble(FileSplit[i + 3]);
                                             if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
                                             {
-                                                TimePos = Math.Sqrt(2 * S / A);
-                                                for (int j = 0; j < TimePos; j += 1)
+                                                TimePos1 = Math.Sqrt(2 * S / A);
+                                                for (int j = 0; j < TimePos1; j ++)
                                                 {
-                                                    PointsX.Add(TimeWait + j);
-                                                    PointsY.Add(RealPosition + A * j * j / 2);
-                                                }
-
-                                                T += Math.Sqrt(2 * S / A);
-                                                Time.Add(T);
-                                            }
-                                            else
-                                            {
-                                                TimePos = (V / A) + ((S - (V * V / (2 * A))) / V);
-                                                for (int j = 0; j < TimePos; j += 1)
-                                                {
-                                                    if ((RealPosition + A * j * j / 2) <= LastPosition)
+                                                    if (RealPosition1 <= LastPosition1)
                                                     {
-                                                        PointsX.Add(TimeWait + j);
-                                                        PointsY.Add(RealPosition + A * j * j / 2);
+                                                        PointsX1.Add(AbsolutTime + j);
+                                                        PointsY1.Add(RealPosition1 + A * j * j / 2);
                                                     }
                                                     else
                                                     {
-                                                        PointsX.Add(TimeWait + j);
-                                                        PointsY.Add(LastPosition);
+                                                        PointsX1.Add(AbsolutTime + j);
+                                                        PointsY1.Add(RealPosition1 - A * j * j / 2);
+                                                    }
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                TimePos1 = (V / A) + ((S - (V * V / (2 * A))) / V);
+                                                for (int j = 0; j < TimePos1; j ++)
+                                                {
+                                                    if (A * j <= V)
+                                                    {
+                                                        if(RealPosition1 <= LastPosition1)
+                                                        {
+                                                            PointsX1.Add(AbsolutTime + j);
+                                                            PointsY1.Add(RealPosition1 + A * j * j / 2);
+                                                            NewPos = RealPosition1 + A * j * j / 2;
+                                                            J = j;
+                                                        }
+                                                        else
+                                                        {
+                                                            PointsX1.Add(AbsolutTime + j);
+                                                            PointsY1.Add(RealPosition1 - A * j * j / 2);
+                                                            NewPos = RealPosition1 - A * j * j / 2;
+                                                            J = j;
+                                                        }
+                                                        
+                                                    }
+                                                    else
+                                                    {
+                                                        PointsX1.Add(AbsolutTime + j);
+                                                        PointsY1.Add(NewPos + V * (j - J));
                                                     }
                                                 }
-
-                                                T += (V / A) + ((S - (V * V / (2 * A))) / V);
-                                                Time.Add(T);
                                             }
                                             break;
                                         case "2":
+                                            S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition2);
+                                            RealPosition2 = LastPosition2;
+                                            LastPosition2 = Convert.ToDouble(FileSplit[i + 3]);
+                                            if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
+                                            {
+                                                TimePos2 = Math.Sqrt(2 * S / A);
+                                                for (int j = 0; j < TimePos2; j++)
+                                                {
+                                                    if (RealPosition2 <= LastPosition2)
+                                                    {
+                                                        PointsX2.Add(AbsolutTime + j);
+                                                        PointsY2.Add(RealPosition2 + A * j * j / 2);
+                                                    }
+                                                    else
+                                                    {
+                                                        PointsX2.Add(AbsolutTime + j);
+                                                        PointsY2.Add(RealPosition2 - A * j * j / 2);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                TimePos2 = (V / A) + ((S - (V * V / (2 * A))) / V);
+                                                for (int j = 0; j < TimePos2; j++)
+                                                {
+                                                    if (A * j <= V)
+                                                    {
+                                                        if (RealPosition2 <= LastPosition2)
+                                                        {
+                                                            PointsX2.Add(AbsolutTime + j);
+                                                            PointsY2.Add(RealPosition2 + A * j * j / 2);
+                                                            NewPos = RealPosition2 + A * j * j / 2;
+                                                            J = j;
+                                                        }
+                                                        else
+                                                        {
+                                                            PointsX2.Add(AbsolutTime + j);
+                                                            PointsY2.Add(RealPosition2 - A * j * j / 2);
+                                                            NewPos = RealPosition2 - A * j * j / 2;
+                                                            J = j;
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        PointsX1.Add(AbsolutTime + j);
+                                                        PointsY1.Add(NewPos + V * (j - J));
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        case "3":
+                                            S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition3);
+                                            RealPosition3 = LastPosition3;
+                                            LastPosition3 = Convert.ToDouble(FileSplit[i + 3]);
+                                            if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
+                                            {
+                                                TimePos3 = Math.Sqrt(2 * S / A);
+                                                for (int j = 0; j < TimePos3; j++)
+                                                {
+                                                    if (RealPosition3 <= LastPosition3)
+                                                    {
+                                                        PointsX3.Add(AbsolutTime + j);
+                                                        PointsY3.Add(RealPosition3 + A * j * j / 2);
+                                                    }
+                                                    else
+                                                    {
+                                                        PointsX3.Add(AbsolutTime + j);
+                                                        PointsY3.Add(RealPosition3 - A * j * j / 2);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                TimePos3 = (V / A) + ((S - (V * V / (2 * A))) / V);
+                                                for (int j = 0; j < TimePos3; j++)
+                                                {
+                                                    if (A * j <= V)
+                                                    {
+                                                        if (RealPosition3 <= LastPosition3)
+                                                        {
+                                                            PointsX3.Add(AbsolutTime + j);
+                                                            PointsY3.Add(RealPosition3 + A * j * j / 2);
+                                                            NewPos = RealPosition3 + A * j * j / 2;
+                                                            J = j;
+                                                        }
+                                                        else
+                                                        {
+                                                            PointsX3.Add(AbsolutTime + j);
+                                                            PointsY3.Add(RealPosition3 - A * j * j / 2);
+                                                            NewPos = RealPosition3 - A * j * j / 2;
+                                                            J = j;
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        PointsX3.Add(AbsolutTime + j);
+                                                        PointsY3.Add(NewPos + V * (j - J));
+                                                    }
+                                                }
+                                            }
                                             break;
                                     }
                                     
                                     break;
                                 case "RATe":
-                                    Time.Add(T);
                                     break;
                                 case "OSCillation":
-                                    Time.Add(T);
                                     break;
                                 case "CURrent":
-                                    Time.Add(T);
                                     break;
                                 case "GFOrce":
-                                    Time.Add(T);
                                     break;
                                 case "TEMP":
-                                    Time.Add(T);
                                     break;
                             }
                             break;
                         case "INTerlock":
-                            Time.Add(T);
                             break;
                         case "USER":
-                            Time.Add(T);
                             break;
                         case "ADD":
-                            Time.Add(T);
                             break;
                         default:
                             break;
                     }
                 }
-                FinalTime = TimeWait;
             }
         }
         private void SaveButton_Click(object sender, EventArgs e)
@@ -236,13 +353,8 @@ namespace TimeProg
         private void Grafik1_Click(object sender, EventArgs e)
         {
             this.chart1.Series[0].Points.Clear();
-            
-
-            for (int i = 0; i < PointsX.Count; i++)
-            {
-                this.chart1.Series[0].Points.AddXY(PointsX[i], PointsY[i]);
-            }
-            
+            this.chart1.Series[1].Points.Clear();
+            this.chart1.Series[2].Points.Clear();
             for (int i = 0; i < PointsX1.Count; i++)
             {
                 this.chart1.Series[0].Points.AddXY(PointsX1[i], PointsY1[i]);
