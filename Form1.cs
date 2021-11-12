@@ -19,25 +19,32 @@ namespace TimeProg
             InitializeComponent();
             chart1.MouseWheel += chart1_MouseWheel;
         }
-        string PathRead = "0", InputFile = "0", PathWrite = "0";
-
-        List<double> Time = new List<double>();
-        List<List<double>> AllPoints = new List<List<double>>();
         CommandClass MyCommand = new CommandClass();
 
+        string PathRead = "0", InputFile = "0", PathWrite = "0";
+        List<double> Time = new List<double>();
+        
+        
         private void LoadButton_Click(object sender, EventArgs e)
         {
-
             var dlg = new OpenFileDialog();
             dlg.Filter = "txt files (*.txt)|*.txt|seq files (*.seq)|*.seq|All files (*.*)|*.*";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                MyCommand.Kostil(sender, e);
-
+                #region Clear
+                MyCommand.PointsX1.Clear();
+                MyCommand.PointsY1.Clear();
+                MyCommand.PointsX2.Clear();
+                MyCommand.PointsY2.Clear();
+                MyCommand.PointsX3.Clear();
+                MyCommand.PointsY3.Clear();
+                MyCommand.AbsolutTime = 0;
+                #endregion
+                #region Loading
                 PathRead = dlg.FileName;
                 using (FileStream fs = File.Open(PathRead, FileMode.Open))
                 {
-                    byte[] b = new byte[7777024];  //ну да, типа костыль
+                    byte[] b = new byte[7777024];  // Ну да, типа костыль
                     UTF8Encoding temp = new UTF8Encoding(true);
 
                     while (fs.Read(b, 0, b.Length) > 0)
@@ -46,29 +53,26 @@ namespace TimeProg
                     }
                 }
                 string[] FileSplit = InputFile.Split(':', ';', ' ', '\n');
+                #endregion
+                #region Commands
                 for (int i = 0; i < FileSplit.Length; i++)
                 {
                     switch (FileSplit[i])
                     {
                         case "LOGic":
-                            
                             switch (FileSplit[i + 1])
                             {
                                 case "WAIT":
-                                    AllPoints = MyCommand.LogWAIT(FileSplit, i);
+                                    MyCommand.LogWAIT(FileSplit, i);
                                     break;
                                 case "WAITPos":
-                                    AllPoints = MyCommand.LogWAITPos(FileSplit, i);
-                                    
+                                    MyCommand.LogWAITPos(FileSplit, i);
                                     break;
                                 case "WAITRate":
-                                    
                                     break;
                                 case "WAITTemp":
-                                    
                                     break;
                                 case "WAITGForce":
-                                    
                                     break;
                                 case "Do":
                                     break;
@@ -82,7 +86,7 @@ namespace TimeProg
                             switch (FileSplit[i + 1])
                             {
                                 case "POSition":
-                                    AllPoints = MyCommand.DemPOSition(FileSplit, i);
+                                    MyCommand.DemPOSition(FileSplit, i);
                                     break;
                                 case "RATe":
                                     break;
@@ -106,10 +110,12 @@ namespace TimeProg
                             break;
                     }
                 }
+                #endregion
             }
         }
         private void SaveButton_Click(object sender, EventArgs e)
         {
+            #region Save
             string[] EndSplit = InputFile.Split('\n');
             var dialog = new OpenFileDialog();
             dialog.Filter = "txt files (*.txt)|*.txt|seq files (*.seq)|*.seq|All files (*.*)|*.*";
@@ -124,32 +130,34 @@ namespace TimeProg
                     }
                 }
             }
+            #endregion
         }
 
         private void Grafik1_Click(object sender, EventArgs e)
         {
+            #region Drawing
             this.chart1.Series[0].Points.Clear();
             this.chart1.Series[1].Points.Clear();
             this.chart1.Series[2].Points.Clear();
-            for (int i = 0; i < AllPoints[0].Count; i++)
+            for (int i = 0; i < MyCommand.PointsX1.Count; i++)
             {
-                this.chart1.Series[0].Points.AddXY(AllPoints[0][i], AllPoints[1][i]);
+                this.chart1.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.PointsY1[i]);
             }
             
-            for (int i = 0; i < AllPoints[2].Count; i++)
+            for (int i = 0; i < MyCommand.PointsX2.Count; i++)
             {
-                this.chart1.Series[1].Points.AddXY(AllPoints[2][i], AllPoints[3][i]);
+                this.chart1.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.PointsY2[i]);
             }
             
-            for (int i = 0; i < AllPoints[4].Count; i++)
+            for (int i = 0; i < MyCommand.PointsX3.Count; i++)
             {
-                this.chart1.Series[2].Points.AddXY(AllPoints[4][i], AllPoints[5][i]);
+                this.chart1.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.PointsY3[i]);
             }
-
-            
+            #endregion
         }
         private void chart1_MouseWheel(object sender, MouseEventArgs e)
         {
+            #region Zoom
             chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
             chart1.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
             
@@ -187,6 +195,7 @@ namespace TimeProg
                 }
             }
             catch { }
+            #endregion
         }
     }
 }
