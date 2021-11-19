@@ -9,15 +9,16 @@ namespace TimeProgClass
     public class CommandClass
     {
         int Case = 0;
-        public double T = 0, S = 0, V = 0, A = 0, AbsolutTime = 0, NewPos = 0, J = 0,  
+        public double S = 0, V = 0, A = 0, AbsolutTime = 0, NewPos = 0, J = 0,  
             RealPosition1 = 0, RealPosition2 = 0, RealPosition3 = 0,
             LastPosition1 = 0, LastPosition2 = 0, LastPosition3 = 0,
             TimePos1 = 0, TimePos2 = 0, TimePos3 = 0,
             RealTime1 = 0, RealTime2 = 0, RealTime3 = 0;
-        double[] RealPosition = new double[] { 0, 0, 0 }; //нужно будет обнулять
-        double[] LastPosition = new double[] { 0, 0, 0 };
-        double[] TimePos = new double[] { 0, 0, 0 };
-        double[] RealTime = new double[] { 0, 0, 0 };
+        public double[] RealPosition = new double[] { 0, 0, 0 };
+        public double[] LastPosition = new double[] { 0, 0, 0 };
+        public double[] TimePos = new double[] { 0, 0, 0 };
+        public double[] RealTime = new double[] { 0, 0, 0 };
+        public int[] Counter = new int[] { 0, 0, 0 };
         //public List<List<double>> AllPoints = new List<List<double>>();
         public List<double> PointsX1 = new List<double>();
         public List<double> PointsY1 = new List<double>();
@@ -100,18 +101,14 @@ namespace TimeProgClass
             }
             for (int n = 0; n < ActivePointsX.Count; n++)
             {
-                PointsX1.Add(ActivePointsX[n]);// заменить на простое достроение точек в пустом пространстве
-                PointsX2.Add(ActivePointsX[n]);
-                PointsX3.Add(ActivePointsX[n]);
-                PointsY3.Add(LastPosition[2]);
                 if (FileSplit[i + 2] == "1")
                 {
+                    PointsX1.Add(ActivePointsX[n]);
                     PointsY1.Add(ActivePointsY[n]);
-                    PointsY2.Add(LastPosition[1]);
                 }
                 else
                 {
-                    PointsY1.Add(LastPosition[0]);
+                    PointsX2.Add(ActivePointsX[n]);
                     PointsY2.Add(ActivePointsY[n]);
                 }
             }
@@ -145,35 +142,36 @@ namespace TimeProgClass
         }
         public void LogWAITPos(string[] FileSplit, int i)
         {
+
             switch (FileSplit[i + 2])
             {
                 case "1":
-                    RealTime1 = AbsolutTime + TimePos1;
-                    AbsolutTime += (TimePos1 + Convert.ToDouble(FileSplit[i + 4]) / 1000);
+                    RealTime1 = AbsolutTime + TimePos[0];
+                    AbsolutTime += TimePos[0] + Convert.ToDouble(FileSplit[i + 4]) / 1000;
                     while (RealTime1 < AbsolutTime)
                     {
                         PointsX1.Add(RealTime1);
-                        PointsY1.Add(LastPosition1);
+                        PointsY1.Add(LastPosition[0]);
                         RealTime1++;
                     }
                     break;
                 case "2":
-                    RealTime2 = AbsolutTime + TimePos2;
-                    AbsolutTime += (TimePos2 + Convert.ToDouble(FileSplit[i + 4]) / 1000);
+                    RealTime2 = AbsolutTime + TimePos[1];
+                    AbsolutTime += TimePos[1] + Convert.ToDouble(FileSplit[i + 4]) / 1000;
                     while (RealTime2 < AbsolutTime)
                     {
                         PointsX2.Add(RealTime2);
-                        PointsY2.Add(LastPosition2);
+                        PointsY2.Add(LastPosition[1]);
                         RealTime2++;
                     }
                     break;
                 case "3":
-                    RealTime3 = AbsolutTime + TimePos3;
-                    AbsolutTime += (TimePos3 + Convert.ToDouble(FileSplit[i + 4]) / 1000);
+                    RealTime3 = AbsolutTime + TimePos[2];
+                    AbsolutTime += TimePos[2] + Convert.ToDouble(FileSplit[i + 4]) / 1000;
                     while (RealTime3 < AbsolutTime)
                     {
                         PointsX3.Add(RealTime3);
-                        PointsY3.Add(LastPosition3);
+                        PointsY3.Add(LastPosition[2]);
                         RealTime3++;
                     }
                     break;

@@ -39,6 +39,9 @@ namespace TimeProg
                 MyCommand.PointsX3.Clear();
                 MyCommand.PointsY3.Clear();
                 MyCommand.AbsolutTime = 0;
+                MyCommand.LastPosition[0] = 0;
+                MyCommand.LastPosition[1] = 0;
+                MyCommand.LastPosition[2] = 0;
                 #endregion
                 #region Loading
                 PathRead = dlg.FileName;
@@ -108,6 +111,47 @@ namespace TimeProg
                             break;
                         default:
                             break;
+                    }
+                }
+                #endregion
+                #region AddPoints
+                MyCommand.Counter[0] = MyCommand.PointsX1.Count;
+                for (int g = 0; g < MyCommand.Counter[0] - 1; g++)
+                {
+                    if (MyCommand.PointsX1[g + 1] - MyCommand.PointsX1[g] != 1)
+                    {
+                        for (double k = 1; k < (MyCommand.PointsX1[g + 1] - MyCommand.PointsX1[g]); k++)
+                        {
+                            MyCommand.PointsX1.Add(MyCommand.PointsX1[g] + k);
+                            MyCommand.PointsY1.Add(MyCommand.PointsY1[g]);
+                        }
+
+                    }
+                }
+                MyCommand.Counter[1] = MyCommand.PointsX2.Count;
+                for (int g = 0; g < MyCommand.Counter[1] - 1; g++)
+                {
+                    if (MyCommand.PointsX2[g + 1] - MyCommand.PointsX2[g] != 1)
+                    {
+                        for (double k = 1; k < (MyCommand.PointsX2[g + 1] - MyCommand.PointsX2[g]); k++)
+                        {
+                            MyCommand.PointsX2.Add(MyCommand.PointsX2[g] + k);
+                            MyCommand.PointsY2.Add(MyCommand.PointsY2[g]);
+                        }
+
+                    }
+                }
+                MyCommand.Counter[2] = MyCommand.PointsX3.Count;
+                for (int g = 0; g < MyCommand.Counter[2] - 1; g++)
+                {
+                    if (MyCommand.PointsX3[g + 1] - MyCommand.PointsX3[g] != 1)
+                    {
+                        for (double k = 1; k < (MyCommand.PointsX3[g + 1] - MyCommand.PointsX3[g]); k++)
+                        {
+                            MyCommand.PointsX3.Add(MyCommand.PointsX3[g] + k);
+                            MyCommand.PointsY3.Add(MyCommand.PointsY3[g]);
+                        }
+
                     }
                 }
                 #endregion

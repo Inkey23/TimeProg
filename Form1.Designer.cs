@@ -66,7 +66,7 @@ namespace TimeProg
             // 
             this.Grafik1.Location = new System.Drawing.Point(599, 559);
             this.Grafik1.Name = "Grafik1";
-            this.Grafik1.Size = new System.Drawing.Size(260, 45);
+            this.Grafik1.Size = new System.Drawing.Size(275, 45);
             this.Grafik1.TabIndex = 2;
             this.Grafik1.Text = "Построить график";
             this.Grafik1.UseVisualStyleBackColor = true;
