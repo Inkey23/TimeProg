@@ -83,15 +83,15 @@ namespace TimeProg
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series1.Legend = "Legend1";
-            series1.Name = "Series1";
+            series1.Name = "Горизонтальная пл-ть";
             series2.ChartArea = "ChartArea1";
             series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series2.Legend = "Legend1";
-            series2.Name = "Series2";
+            series2.Name = "Вертикальная пл-ть";
             series3.ChartArea = "ChartArea1";
             series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series3.Legend = "Legend1";
-            series3.Name = "Series3";
+            series3.Name = "Температура";
             this.chart1.Series.Add(series1);
             this.chart1.Series.Add(series2);
             this.chart1.Series.Add(series3);
@@ -100,7 +100,7 @@ namespace TimeProg
             this.chart1.Text = "chart1";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             title1.Name = "Title1";
-            title1.Text = "Циклограмма";
+            title1.Text = "Циклогрмма";
             this.chart1.Titles.Add(title1);
             // 
             // Form1

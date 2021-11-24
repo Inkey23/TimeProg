@@ -42,6 +42,9 @@ namespace TimeProg
                 MyCommand.LastPosition[0] = 0;
                 MyCommand.LastPosition[1] = 0;
                 MyCommand.LastPosition[2] = 0;
+                MyCommand.TimePos[0] = 0;
+                MyCommand.TimePos[1] = 0;
+                MyCommand.TimePos[2] = 0;
                 #endregion
                 #region Loading
                 PathRead = dlg.FileName;
@@ -72,8 +75,10 @@ namespace TimeProg
                                     MyCommand.LogWAITPos(FileSplit, i);
                                     break;
                                 case "WAITRate":
+                                    MyCommand.LogWAITRate(FileSplit, i);
                                     break;
                                 case "WAITTemp":
+                                    MyCommand.LogWAITTemp(FileSplit, i);
                                     break;
                                 case "WAITGForce":
                                     break;
@@ -92,14 +97,17 @@ namespace TimeProg
                                     MyCommand.DemPOSition(FileSplit, i);
                                     break;
                                 case "RATe":
+                                    MyCommand.DemRATe(FileSplit, i);
                                     break;
                                 case "OSCillation":
+                                    MyCommand.DemOSCillation(FileSplit, i);//Пока пусто
                                     break;
                                 case "CURrent":
                                     break;
                                 case "GFOrce":
                                     break;
                                 case "TEMP":
+                                    MyCommand.DemTEMP(FileSplit, i);
                                     break;
                             }
                             break;
@@ -141,6 +149,7 @@ namespace TimeProg
 
                     }
                 }
+                /*
                 MyCommand.Counter[2] = MyCommand.PointsX3.Count;
                 for (int g = 0; g < MyCommand.Counter[2] - 1; g++)
                 {
@@ -154,6 +163,7 @@ namespace TimeProg
 
                     }
                 }
+                */
                 #endregion
             }
         }
@@ -179,6 +189,8 @@ namespace TimeProg
 
         private void Grafik1_Click(object sender, EventArgs e)
         {
+            chart1.Name = "asd";
+            
             #region Drawing
             this.chart1.Series[0].Points.Clear();
             this.chart1.Series[1].Points.Clear();
