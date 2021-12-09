@@ -45,6 +45,10 @@ namespace TimeProg
                 MyCommand.TimePos[0] = 0;
                 MyCommand.TimePos[1] = 0;
                 MyCommand.TimePos[2] = 0;
+                MyCommand.LastRate[0] = 0;
+                MyCommand.LastRate[1] = 0;
+                MyCommand.TimeRate[0] = 0;
+                MyCommand.TimeRate[1] = 0;
                 #endregion
                 #region Loading
                 PathRead = dlg.FileName;
@@ -58,64 +62,66 @@ namespace TimeProg
                         InputFile = temp.GetString(b);
                     }
                 }
+                InputFile = InputFile.ToLower();
                 string[] FileSplit = InputFile.Split(':', ';', ' ', '\n');
+                
                 #endregion
                 #region Commands
                 for (int i = 0; i < FileSplit.Length; i++)
                 {
                     switch (FileSplit[i])
                     {
-                        case "LOGic":
+                        case ("logic"):
                             switch (FileSplit[i + 1])
                             {
-                                case "WAIT":
+                                case "wait":
                                     MyCommand.LogWAIT(FileSplit, i);
                                     break;
-                                case "WAITPos":
+                                case "waitpos":
                                     MyCommand.LogWAITPos(FileSplit, i);
                                     break;
-                                case "WAITRate":
+                                case "waitrate":
                                     MyCommand.LogWAITRate(FileSplit, i);
                                     break;
-                                case "WAITTemp":
+                                case "waittemp":
                                     MyCommand.LogWAITTemp(FileSplit, i);
                                     break;
-                                case "WAITGForce":
+                                case "waitgforce":
                                     break;
-                                case "Do":
+                                case "do":
                                     break;
-                                case "LOOPUntil":
+                                case "loopuntil":
                                     break;
-                                case "GOTO":
+                                case "goto":
                                     break;
                             }
                             break;
-                        case "DEMand":
+                        case "demand":
                             switch (FileSplit[i + 1])
                             {
-                                case "POSition":
+                                case "position":
                                     MyCommand.DemPOSition(FileSplit, i);
                                     break;
-                                case "RATe":
+                                case "rate":
                                     MyCommand.DemRATe(FileSplit, i);
                                     break;
-                                case "OSCillation":
+                                case "oscillation":
                                     MyCommand.DemOSCillation(FileSplit, i);//Пока пусто
                                     break;
-                                case "CURrent":
+                                case "current":
                                     break;
-                                case "GFOrce":
+                                case "gforce":
                                     break;
-                                case "TEMP":
+                                case "temp":
                                     MyCommand.DemTEMP(FileSplit, i);
                                     break;
                             }
                             break;
-                        case "INTerlock":
+                        case "interlock":
                             break;
-                        case "USER":
+                        case "user":
                             break;
-                        case "ADD":
+                        case "add":
                             break;
                         default:
                             break;
@@ -123,6 +129,7 @@ namespace TimeProg
                 }
                 #endregion
                 #region AddPoints
+                
                 MyCommand.Counter[0] = MyCommand.PointsX1.Count;
                 for (int g = 0; g < MyCommand.Counter[0] - 1; g++)
                 {
@@ -149,7 +156,7 @@ namespace TimeProg
 
                     }
                 }
-                /*
+                
                 MyCommand.Counter[2] = MyCommand.PointsX3.Count;
                 for (int g = 0; g < MyCommand.Counter[2] - 1; g++)
                 {
@@ -163,7 +170,7 @@ namespace TimeProg
 
                     }
                 }
-                */
+                
                 #endregion
             }
         }
@@ -189,7 +196,6 @@ namespace TimeProg
 
         private void Grafik1_Click(object sender, EventArgs e)
         {
-            chart1.Name = "asd";
             
             #region Drawing
             this.chart1.Series[0].Points.Clear();
