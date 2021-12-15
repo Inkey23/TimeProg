@@ -33,15 +33,21 @@ namespace TimeProg
             {
                 #region Clear
                 MyCommand.PointsX1.Clear();
+                MyCommand.PointsX1.Add(0);
                 MyCommand.PointsY1.Clear();
+                MyCommand.PointsY1.Add(0);
                 MyCommand.PointsX2.Clear();
+                MyCommand.PointsX2.Add(0);
                 MyCommand.PointsY2.Clear();
+                MyCommand.PointsY2.Add(0);
                 MyCommand.PointsX3.Clear();
+                MyCommand.PointsX3.Add(0);
                 MyCommand.PointsY3.Clear();
+                MyCommand.PointsY3.Add(20);
                 MyCommand.AbsolutTime = 0;
                 MyCommand.LastPosition[0] = 0;
                 MyCommand.LastPosition[1] = 0;
-                MyCommand.LastPosition[2] = 0;
+                MyCommand.LastPosition[2] = 20;
                 MyCommand.TimePos[0] = 0;
                 MyCommand.TimePos[1] = 0;
                 MyCommand.TimePos[2] = 0;
@@ -87,12 +93,20 @@ namespace TimeProg
                                     MyCommand.LogWAITTemp(FileSplit, i);
                                     break;
                                 case "waitgforce":
+                                    MyCommand.ErrorFlag = true;
+                                    Console.WriteLine("Обработка команды waitgforce находится в стадии разработки");
                                     break;
                                 case "do":
+                                    MyCommand.ErrorFlag = true;
+                                    Console.WriteLine("Обработка команды do находится в стадии разработки");
                                     break;
                                 case "loopuntil":
+                                    MyCommand.ErrorFlag = true;
+                                    Console.WriteLine("Обработка команды loopuntil находится в стадии разработки");
                                     break;
                                 case "goto":
+                                    MyCommand.ErrorFlag = true;
+                                    Console.WriteLine("Обработка команды goto находится в стадии разработки");
                                     break;
                             }
                             break;
@@ -109,8 +123,12 @@ namespace TimeProg
                                     MyCommand.DemOSCillation(FileSplit, i);//Пока пусто
                                     break;
                                 case "current":
+                                    MyCommand.ErrorFlag = true;
+                                    Console.WriteLine("Обработка команды current находится в стадии разработки");
                                     break;
                                 case "gforce":
+                                    MyCommand.ErrorFlag = true;
+                                    Console.WriteLine("Обработка команды gforce находится в стадии разработки");
                                     break;
                                 case "temp":
                                     MyCommand.DemTEMP(FileSplit, i);
@@ -118,17 +136,66 @@ namespace TimeProg
                             }
                             break;
                         case "interlock":
+                            MyCommand.ErrorFlag = true;
+                            Console.WriteLine("Обработка команды interlock находится в стадии разработки");
                             break;
                         case "user":
+                            MyCommand.ErrorFlag = true;
+                            Console.WriteLine("Обработка команды user находится в стадии разработки");
                             break;
                         case "add":
+                            MyCommand.ErrorFlag = true;
+                            Console.WriteLine("Обработка команды add находится в стадии разработки");
                             break;
                         default:
                             break;
                     }
                 }
                 #endregion
+                #region Points processing
+                for (int i = 0; i < MyCommand.PointsX1.Count - 1; i++)
+                {
+                    if (MyCommand.PointsY1[i] - MyCommand.PointsY1[i + 1] > 10000)
+                    {
+                        MyCommand.PointsY1[i + 1] = MyCommand.PointsY1[i + 1] + 11520;
+                    }
+                    else if (MyCommand.PointsY1[i] - MyCommand.PointsY1[i + 1] < -10000)
+                    {
+                        MyCommand.PointsY1[i + 1] = MyCommand.PointsY1[i + 1] - 11520;
+                    }
+                }
+                for (int i = 0; i < MyCommand.PointsX2.Count - 1; i++)
+                {
+                    if (MyCommand.PointsY2[i] - MyCommand.PointsY2[i + 1] > 10000)
+                    {
+                        MyCommand.PointsY2[i + 1] = MyCommand.PointsY2[i + 1] + 11520;
+                    }
+                    else if (MyCommand.PointsY2[i] - MyCommand.PointsY2[i + 1] < -10000)
+                    {
+                        MyCommand.PointsY2[i + 1] = MyCommand.PointsY2[i + 1] - 11520;
+                    }
+                }
+                #endregion
                 #region AddPoints
+                double LastTime;
+                if ((MyCommand.PointsX1[MyCommand.PointsX1.Count - 1] >= MyCommand.PointsX2[MyCommand.PointsX2.Count - 1]) && (MyCommand.PointsX1[MyCommand.PointsX1.Count - 1] >= MyCommand.PointsX3[MyCommand.PointsX3.Count - 1]))
+                {
+                    LastTime = MyCommand.PointsX1[MyCommand.PointsX1.Count - 1];
+                }
+                else if ((MyCommand.PointsX2[MyCommand.PointsX2.Count - 1] >= MyCommand.PointsX1[MyCommand.PointsX1.Count - 1]) && (MyCommand.PointsX2[MyCommand.PointsX2.Count - 1] >= MyCommand.PointsX3[MyCommand.PointsX3.Count - 1]))
+                {
+                    LastTime = MyCommand.PointsX2[MyCommand.PointsX2.Count - 1];
+                }
+                else
+                {
+                    LastTime = MyCommand.PointsX3[MyCommand.PointsX3.Count - 1];
+                }
+                MyCommand.PointsX1.Add(LastTime);
+                MyCommand.PointsY1.Add(MyCommand.LastPosition[0]);
+                MyCommand.PointsX2.Add(LastTime);
+                MyCommand.PointsY2.Add(MyCommand.LastPosition[1]);
+                MyCommand.PointsX3.Add(LastTime);
+                MyCommand.PointsY3.Add(MyCommand.LastPosition[2]);
                 
                 MyCommand.Counter[0] = MyCommand.PointsX1.Count;
                 for (int g = 0; g < MyCommand.Counter[0] - 1; g++)
@@ -170,12 +237,12 @@ namespace TimeProg
 
                     }
                 }
-                
                 #endregion
             }
         }
         private void SaveButton_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("Данная команда находится в стадии разработки");
             #region Save
             string[] EndSplit = InputFile.Split('\n');
             var dialog = new OpenFileDialog();
@@ -196,7 +263,10 @@ namespace TimeProg
 
         private void Grafik1_Click(object sender, EventArgs e)
         {
-            
+            if(MyCommand.ErrorFlag == true)
+            {
+                MessageBox.Show("Были обнаружены ошибки скрипта. Пожалуйста, проверьте консоль");
+            }
             #region Drawing
             this.chart1.Series[0].Points.Clear();
             this.chart1.Series[1].Points.Clear();

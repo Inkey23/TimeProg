@@ -11,18 +11,18 @@ using System.IO;
 using TimeProgClass;
 
 
-namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 5760! Добавить нормальное увеличение. Добавить возможность убирать оси. Добавить начальные и конечные точки. Разобраться с увеличением. Добавить выгрузку файла.
+namespace TimeProgClass //Добавить галочку учета 5760? Добавить нормальное увеличение. Добавить возможность убирать оси. Добавить выгрузку файла. Добавить сообщения об ошибках.
 {
     public class CommandClass
     {
-        int Case = 0;
-        bool OSCflag = false;
+        public int Case = 0;
+        public bool OSCflag = false, ErrorFlag = false;
         public double S = 0, V = 0, A = 0, AbsolutTime = 0, NewPos = 0, J = 0;
         public double[] LastRate = new double[] { 0, 0 };
         public double[] RealRate = new double[] { 0, 0 };
         public double[] TimeRate = new double[] { 0, 0 };
         public double[] RealPosition = new double[] { 0, 0, 0 };
-        public double[] LastPosition = new double[] { 0, 0, 25 };
+        public double[] LastPosition = new double[] { 0, 0, 20 };
         public double[] TimePos = new double[] { 0, 0, 0 };
         public double[] RealTime = new double[] { 0, 0, 0 };
         public double[] OSCfreq = new double[] { 0, 0 };
@@ -40,84 +40,92 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
         public void DemPOSition(string[] FileSplit, int i)
         {
             Case = Convert.ToInt32(FileSplit[i + 2]) - 1;
-            V = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
-            A = Math.Abs(Convert.ToDouble(FileSplit[i + 5]));
-            S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition[Case]);
-            RealPosition[Case] = LastPosition[Case];
-            LastPosition[Case] = Convert.ToDouble(FileSplit[i + 3]);
-            if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
+            if (LastRate[Case] == 0)
             {
-                TimePos[Case] = Math.Sqrt(2 * S / A);
-                for (int j = 0; j < TimePos[Case]; j++)
+                V = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
+                A = Math.Abs(Convert.ToDouble(FileSplit[i + 5]));
+                S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition[Case]);
+                RealPosition[Case] = LastPosition[Case];
+                LastPosition[Case] = Convert.ToDouble(FileSplit[i + 3]);
+                if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
                 {
+                    TimePos[Case] = Math.Sqrt(2 * S / A);
+                    for (int j = 0; j < TimePos[Case]; j++)
+                    {
 
-                    if (RealPosition[Case] <= LastPosition[Case])
-                    {
-                        ActivePointsX.Add(AbsolutTime + j);
-                        ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
-                    }
-                    else
-                    {
-                        ActivePointsX.Add(AbsolutTime + j);
-                        ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
-                    }
-
-                }
-            }
-            else
-            {
-                TimePos[Case] = (V / A) + ((S - (V * V / (2 * A))) / V);
-                for (int j = 0; j < TimePos[Case]; j++)
-                {
-                    if (A * j <= V)
-                    {
                         if (RealPosition[Case] <= LastPosition[Case])
                         {
                             ActivePointsX.Add(AbsolutTime + j);
                             ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
-                            NewPos = RealPosition[Case] + A * j * j / 2;
-                            J = j;
                         }
                         else
                         {
                             ActivePointsX.Add(AbsolutTime + j);
                             ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
-                            NewPos = RealPosition[Case] - A * j * j / 2;
-                            J = j;
                         }
 
                     }
-                    else
-                    {
-                        if (RealPosition[Case] <= LastPosition[Case])
-                        {
-                            ActivePointsX.Add(AbsolutTime + j);
-                            ActivePointsY.Add(NewPos + V * (j - J));
-                        }
-                        else
-                        {
-                            ActivePointsX.Add(AbsolutTime + j);
-                            ActivePointsY.Add(NewPos - V * (j - J));
-                        }
-
-                    }
-                }
-            }
-            for (int n = 0; n < ActivePointsX.Count; n++)
-            {
-                if (FileSplit[i + 2] == "1")
-                {
-                    PointsX1.Add(ActivePointsX[n]);
-                    PointsY1.Add(ActivePointsY[n]);
                 }
                 else
                 {
-                    PointsX2.Add(ActivePointsX[n]);
-                    PointsY2.Add(ActivePointsY[n]);
+                    TimePos[Case] = (V / A) + ((S - (V * V / (2 * A))) / V);
+                    for (int j = 0; j < TimePos[Case]; j++)
+                    {
+                        if (A * j <= V)
+                        {
+                            if (RealPosition[Case] <= LastPosition[Case])
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                                NewPos = RealPosition[Case] + A * j * j / 2;
+                                J = j;
+                            }
+                            else
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                                NewPos = RealPosition[Case] - A * j * j / 2;
+                                J = j;
+                            }
+
+                        }
+                        else
+                        {
+                            if (RealPosition[Case] <= LastPosition[Case])
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(NewPos + V * (j - J));
+                            }
+                            else
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(NewPos - V * (j - J));
+                            }
+
+                        }
+                    }
                 }
+                for (int n = 0; n < ActivePointsX.Count; n++)
+                {
+                    if (FileSplit[i + 2] == "1")
+                    {
+                        PointsX1.Add(ActivePointsX[n]);
+                        PointsY1.Add(ActivePointsY[n]);
+                    }
+                    else
+                    {
+                        PointsX2.Add(ActivePointsX[n]);
+                        PointsY2.Add(ActivePointsY[n]);
+                    }
+                }
+                ActivePointsX.Clear();
+                ActivePointsY.Clear();
             }
-            ActivePointsX.Clear();
-            ActivePointsY.Clear();
+            else
+            {
+                ErrorFlag = true;
+                Console.WriteLine("Попытка указать позицию при ненулевой скорости");
+            }
         }
         public void DemRATe(string[] FileSplit, int i)
         {
@@ -129,7 +137,16 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
             for (int j = 0; j < TimeRate[Case]; j++)
             {
                 LastPosition[Case] += RealRate[Case];
-                if(Case == 1)
+                if (LastPosition[Case] > 5760)
+                {
+                    LastPosition[Case] = LastPosition[Case] - 11520;
+                }
+                else if (LastPosition[Case] < -5760)
+                {
+                    LastPosition[Case] = LastPosition[Case] + 11520;
+                }
+                //LastPosition[Case] = 2 * (LastPosition[Case] % 5760) - LastPosition[Case];
+                if (Case == 1)
                 {
                     PointsX2.Add(AbsolutTime + j);
                     PointsY2.Add(LastPosition[Case]);
@@ -175,12 +192,12 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
                 if (RealPosition[2] <= LastPosition[2])
                 {
                     PointsX3.Add(AbsolutTime + j);
-                    PointsY3.Add(RealPosition[Case] + V * j);
+                    PointsY3.Add(RealPosition[2] + V * j);
                 }
                 else
                 {
                     PointsX3.Add(AbsolutTime + j);
-                    PointsY3.Add(RealPosition[Case] - V * j);
+                    PointsY3.Add(RealPosition[2] - V * j);
                 }
 
             }
@@ -200,6 +217,14 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
                     while (RealTime[0] < AbsolutTime)
                     {
                         LastPosition[0] += LastRate[0];
+                        if (LastPosition[0] > 5760)
+                        {
+                            LastPosition[0] = LastPosition[0] - 11520;
+                        }
+                        else if (LastPosition[0] < -5760)
+                        {
+                            LastPosition[0] = LastPosition[0] + 11520;
+                        }
                         PointsX1.Add(RealTime[0]);
                         PointsY1.Add(LastPosition[0]);
                         RealTime[0]++;
@@ -212,8 +237,16 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
                     while (RealTime[1] < AbsolutTime)
                     {
                         LastPosition[1] += LastRate[1];
-                        PointsX1.Add(RealTime[1]);
-                        PointsY1.Add(LastPosition[1]);
+                        if (LastPosition[1] > 5760)
+                        {
+                            LastPosition[1] = LastPosition[1] - 11520;
+                        }
+                        else if (LastPosition[1] < -5760)
+                        {
+                            LastPosition[1] = LastPosition[1] + 11520;
+                        }
+                        PointsX2.Add(RealTime[1]);
+                        PointsY2.Add(LastPosition[1]);
                         RealTime[1]++;
                     }
                 }
@@ -225,6 +258,14 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
                     while (RealTime[0] < AbsolutTime)
                     {
                         LastPosition[0] += LastRate[0];
+                        if (LastPosition[0] > 5760)
+                        {
+                            LastPosition[0] = LastPosition[0] - 11520;
+                        }
+                        else if (LastPosition[0] < -5760)
+                        {
+                            LastPosition[0] = LastPosition[0] + 11520;
+                        }
                         PointsX1.Add(RealTime[0]);
                         PointsY1.Add(LastPosition[0]);
                         RealTime[0]++;
@@ -232,8 +273,16 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
                     while (RealTime[1] < AbsolutTime)
                     {
                         LastPosition[1] += LastRate[1];
-                        PointsX1.Add(RealTime[1]);
-                        PointsY1.Add(LastPosition[1]);
+                        if (LastPosition[1] > 5760)
+                        {
+                            LastPosition[1] = LastPosition[1] - 11520;
+                        }
+                        else if (LastPosition[1] < -5760)
+                        {
+                            LastPosition[1] = LastPosition[1] + 11520;
+                        }
+                        PointsX2.Add(RealTime[1]);
+                        PointsY2.Add(LastPosition[1]);
                         RealTime[1]++;
                     }
                 }
@@ -301,6 +350,14 @@ namespace TimeProgClass //Добавить ВОЗМОЖНОСТЬ учета 576
             while (RealTime[Case] < AbsolutTime)
             {
                 LastPosition[Case] += LastRate[Case];
+                if (LastPosition[Case] > 5760)
+                {
+                    LastPosition[Case] = LastPosition[Case] - 11520;
+                }
+                else if (LastPosition[Case] < -5760)
+                {
+                    LastPosition[Case] = LastPosition[Case] + 11520;
+                }
                 if (Case == 1)
                 {
                     PointsX2.Add(RealTime[Case]);
