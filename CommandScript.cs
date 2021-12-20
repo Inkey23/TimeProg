@@ -11,8 +11,10 @@ using System.IO;
 using TimeProgClass;
 
 
-namespace TimeProgClass //Добавить галочку учета 5760? Добавить нормальное увеличение. Добавить возможность убирать оси. Добавить выгрузку файла. Добавить сообщения об ошибках.
-{
+namespace TimeProgClass
+{   //(Важные) Добавить нормальное увеличение. Возможность растягивать окно.               
+    //(Средние) Выгрузка - время, позиция, скорость, ускорение. Вывод ошибок на экран. 
+    //(Не важные) Возможность переключения времени часы/минуты/секунды. Исключить команду WAIT?? Добавить галочку учета 5760? Возможность менять частоту построения с 1сек на другое???
     public class CommandClass
     {
         public int Case = 0;
@@ -34,8 +36,12 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
         public List<double> PointsY2 = new List<double>();
         public List<double> PointsX3 = new List<double>();
         public List<double> PointsY3 = new List<double>();
+        public List<double> RateY1 = new List<double>();
+        public List<double> RateY2 = new List<double>();
+        public List<double> RateY3 = new List<double>();
         public List<double> ActivePointsX = new List<double>();
         public List<double> ActivePointsY = new List<double>();
+        public List<double> ActiveRateY = new List<double>();
 
         public void DemPOSition(string[] FileSplit, int i)
         {
@@ -57,11 +63,13 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                         {
                             ActivePointsX.Add(AbsolutTime + j);
                             ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                            ActiveRateY.Add(A * j);
                         }
                         else
                         {
                             ActivePointsX.Add(AbsolutTime + j);
                             ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                            ActiveRateY.Add(-A * j);
                         }
 
                     }
@@ -77,6 +85,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                             {
                                 ActivePointsX.Add(AbsolutTime + j);
                                 ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                                ActiveRateY.Add(A * j);
                                 NewPos = RealPosition[Case] + A * j * j / 2;
                                 J = j;
                             }
@@ -84,6 +93,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                             {
                                 ActivePointsX.Add(AbsolutTime + j);
                                 ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                                ActiveRateY.Add(-A * j);
                                 NewPos = RealPosition[Case] - A * j * j / 2;
                                 J = j;
                             }
@@ -95,11 +105,13 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                             {
                                 ActivePointsX.Add(AbsolutTime + j);
                                 ActivePointsY.Add(NewPos + V * (j - J));
+                                ActiveRateY.Add(V);
                             }
                             else
                             {
                                 ActivePointsX.Add(AbsolutTime + j);
                                 ActivePointsY.Add(NewPos - V * (j - J));
+                                ActiveRateY.Add(-V);
                             }
 
                         }
@@ -111,15 +123,18 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                     {
                         PointsX1.Add(ActivePointsX[n]);
                         PointsY1.Add(ActivePointsY[n]);
+                        RateY1.Add(ActiveRateY[n]);
                     }
                     else
                     {
                         PointsX2.Add(ActivePointsX[n]);
                         PointsY2.Add(ActivePointsY[n]);
+                        RateY2.Add(ActiveRateY[n]);
                     }
                 }
                 ActivePointsX.Clear();
                 ActivePointsY.Clear();
+                ActiveRateY.Clear();
             }
             else
             {
@@ -150,11 +165,13 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                 {
                     PointsX2.Add(AbsolutTime + j);
                     PointsY2.Add(LastPosition[Case]);
+                    RateY2.Add(RealRate[Case]);
                 }
                 else
                 {
                     PointsX1.Add(AbsolutTime + j);
                     PointsY1.Add(LastPosition[Case]);
+                    RateY1.Add(RealRate[Case]);
                 }
                 if (RealRate[Case] <= LastRate[Case])
                 {
@@ -193,11 +210,13 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                 {
                     PointsX3.Add(AbsolutTime + j);
                     PointsY3.Add(RealPosition[2] + V * j);
+                    RateY3.Add(V);
                 }
                 else
                 {
                     PointsX3.Add(AbsolutTime + j);
                     PointsY3.Add(RealPosition[2] - V * j);
+                    RateY3.Add(-V);
                 }
 
             }
@@ -227,6 +246,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                         }
                         PointsX1.Add(RealTime[0]);
                         PointsY1.Add(LastPosition[0]);
+                        RateY1.Add(LastRate[0]);
                         RealTime[0]++;
                     }
                 }
@@ -247,6 +267,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                         }
                         PointsX2.Add(RealTime[1]);
                         PointsY2.Add(LastPosition[1]);
+                        RateY2.Add(LastRate[1]);
                         RealTime[1]++;
                     }
                 }
@@ -268,6 +289,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                         }
                         PointsX1.Add(RealTime[0]);
                         PointsY1.Add(LastPosition[0]);
+                        RateY1.Add(LastRate[0]);
                         RealTime[0]++;
                     }
                     while (RealTime[1] < AbsolutTime)
@@ -283,6 +305,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                         }
                         PointsX2.Add(RealTime[1]);
                         PointsY2.Add(LastPosition[1]);
+                        RateY2.Add(LastRate[1]);
                         RealTime[1]++;
                     }
                 }
@@ -290,6 +313,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
             else
             {
                 double Time = Convert.ToDouble(FileSplit[i + 2]) / 1000, j, W = 2 * Math.PI * OSCfreq[Case], ThisPos = LastPosition[Case];
+                bool Znak = true;
                 S = 2 * Math.Abs(OSCampl[Case]) * 0.1 * OSCfreq[Case] / Math.Abs(OSCfreq[Case]);
                 for (j = AbsolutTime; j < (AbsolutTime + Time); j += (0.1 * OSCfreq[Case]))
                 {
@@ -297,18 +321,37 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                     {
                         PointsX1.Add(AbsolutTime + j);
                         PointsY1.Add(ThisPos);
+                        if(Znak == true)
+                        {
+                            RateY1.Add(OSCfreq[Case] * 2 * OSCampl[Case]);
+                        }
+                        else
+                        {
+                            RateY1.Add(OSCfreq[Case] * -2 * OSCampl[Case]);
+                        }
+                        
                     }
                     else
                     {
                         PointsX2.Add(AbsolutTime + j);
                         PointsY2.Add(ThisPos);
+                        if (Znak == true)
+                        {
+                            RateY2.Add(OSCfreq[Case] * 2 * OSCampl[Case]);
+                        }
+                        else
+                        {
+                            RateY2.Add(OSCfreq[Case] * -2 * OSCampl[Case]);
+                        }
                     }
                     if (j % OSCfreq[Case] < (OSCfreq[Case] / 4) || j % OSCfreq[Case] > (OSCfreq[Case] * 3 / 4))
                     {
+                        Znak = true;
                         ThisPos += S;
                     }
                     else
                     {
+                        Znak = false;
                         ThisPos -= S;
                     }
                 }
@@ -327,6 +370,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                     {
                         PointsX1.Add(RealTime[0]);
                         PointsY1.Add(LastPosition[0]);
+                        RateY1.Add(0);
                         RealTime[0]++;
                     }
                     break;
@@ -337,6 +381,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                     {
                         PointsX2.Add(RealTime[1]);
                         PointsY2.Add(LastPosition[1]);
+                        RateY2.Add(0);
                         RealTime[1]++;
                     }
                     break;
@@ -362,11 +407,13 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
                 {
                     PointsX2.Add(RealTime[Case]);
                     PointsY2.Add(LastPosition[Case]);
+                    RateY2.Add(LastRate[Case]);
                 }
                 else
                 {
                     PointsX1.Add(RealTime[Case]);
                     PointsY1.Add(LastPosition[Case]);
+                    RateY1.Add(LastRate[Case]);
                 }
                 RealTime[Case]++;
             }
@@ -379,6 +426,7 @@ namespace TimeProgClass //Добавить галочку учета 5760? До�
             {
                 PointsX3.Add(RealTime[2]);
                 PointsY3.Add(LastPosition[2]);
+                RateY3.Add(0);
                 RealTime[2]++;
             }
         }

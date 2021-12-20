@@ -17,7 +17,7 @@ namespace TimeProg
         public Form1()
         {
             InitializeComponent();
-            chart1.MouseWheel += chart1_MouseWheel;
+            GrafikTable.MouseWheel += chart1_MouseWheel;
         }
         CommandClass MyCommand = new CommandClass();
 
@@ -44,6 +44,12 @@ namespace TimeProg
                 MyCommand.PointsX3.Add(0);
                 MyCommand.PointsY3.Clear();
                 MyCommand.PointsY3.Add(20);
+                MyCommand.RateY1.Clear();
+                MyCommand.RateY1.Add(0);
+                MyCommand.RateY2.Clear();
+                MyCommand.RateY2.Add(0);
+                MyCommand.RateY3.Clear();
+                MyCommand.RateY3.Add(0);
                 MyCommand.AbsolutTime = 0;
                 MyCommand.LastPosition[0] = 0;
                 MyCommand.LastPosition[1] = 0;
@@ -120,7 +126,7 @@ namespace TimeProg
                                     MyCommand.DemRATe(FileSplit, i);
                                     break;
                                 case "oscillation":
-                                    MyCommand.DemOSCillation(FileSplit, i);//Пока пусто
+                                    MyCommand.DemOSCillation(FileSplit, i);
                                     break;
                                 case "current":
                                     MyCommand.ErrorFlag = true;
@@ -192,11 +198,15 @@ namespace TimeProg
                 }
                 MyCommand.PointsX1.Add(LastTime);
                 MyCommand.PointsY1.Add(MyCommand.LastPosition[0]);
+                MyCommand.RateY1.Add(0);
                 MyCommand.PointsX2.Add(LastTime);
                 MyCommand.PointsY2.Add(MyCommand.LastPosition[1]);
+                MyCommand.RateY2.Add(0);
                 MyCommand.PointsX3.Add(LastTime);
                 MyCommand.PointsY3.Add(MyCommand.LastPosition[2]);
-                
+                MyCommand.RateY3.Add(0);
+
+                /*
                 MyCommand.Counter[0] = MyCommand.PointsX1.Count;
                 for (int g = 0; g < MyCommand.Counter[0] - 1; g++)
                 {
@@ -206,6 +216,7 @@ namespace TimeProg
                         {
                             MyCommand.PointsX1.Add(MyCommand.PointsX1[g] + k);
                             MyCommand.PointsY1.Add(MyCommand.PointsY1[g]);
+                            MyCommand.RateY1.Add(0);
                         }
 
                     }
@@ -219,6 +230,7 @@ namespace TimeProg
                         {
                             MyCommand.PointsX2.Add(MyCommand.PointsX2[g] + k);
                             MyCommand.PointsY2.Add(MyCommand.PointsY2[g]);
+                            MyCommand.RateY2.Add(0);
                         }
 
                     }
@@ -233,11 +245,12 @@ namespace TimeProg
                         {
                             MyCommand.PointsX3.Add(MyCommand.PointsX3[g] + k);
                             MyCommand.PointsY3.Add(MyCommand.PointsY3[g]);
+                            MyCommand.RateY3.Add(0);
                         }
-
                     }
                 }
-                #endregion
+                */
+                #endregion 
             }
         }
         private void SaveButton_Click(object sender, EventArgs e)
@@ -260,38 +273,80 @@ namespace TimeProg
             }
             #endregion
         }
-
         private void Grafik1_Click(object sender, EventArgs e)
         {
             if(MyCommand.ErrorFlag == true)
             {
                 MessageBox.Show("Были обнаружены ошибки скрипта. Пожалуйста, проверьте консоль");
             }
+            GrafikTable.Titles.Remove(GrafikTable.Titles[1]);
+            GrafikTable.Titles.Add(PathRead);
+            GrafikTable.ChartAreas[0].AxisX.Minimum = 0;
+            GrafikTable.ChartAreas[0].AxisX.Title = "Время (сек)";
             #region Drawing
-            this.chart1.Series[0].Points.Clear();
-            this.chart1.Series[1].Points.Clear();
-            this.chart1.Series[2].Points.Clear();
-            for (int i = 0; i < MyCommand.PointsX1.Count; i++)
+            this.GrafikTable.Series[0].Points.Clear();
+            this.GrafikTable.Series[1].Points.Clear();
+            this.GrafikTable.Series[2].Points.Clear();
+            if (CheckRate.Checked)
             {
-                this.chart1.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.PointsY1[i]);
+                GrafikTable.ChartAreas[0].AxisY.Title = "Угл.скорость (град/сек)";
+                GrafikTable.ChartAreas[0].AxisY2.Title = "Темп.скорость (°С/мин)";
+                if (CheckHorizontal.Checked)
+                {
+                    for (int i = 0; i < MyCommand.PointsX1.Count; i++)
+                    {
+                        this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.RateY1[i]);
+                    }
+                }
+                if (CheckVertical.Checked)
+                {
+                    for (int i = 0; i < MyCommand.PointsX2.Count; i++)
+                    {
+                        this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.RateY2[i]);
+                    }
+                }
+                if (CheckTemperature.Checked)
+                {
+                    for (int i = 0; i < MyCommand.PointsX3.Count; i++)
+                    {
+                        this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.RateY3[i]);
+                    }
+                }
+            }
+            else
+            {
+                GrafikTable.ChartAreas[0].AxisY.Title = "Угол (град)";
+                GrafikTable.ChartAreas[0].AxisY2.Title = "Температура (°С)";
+                if (CheckHorizontal.Checked)
+                {
+                    for (int i = 0; i < MyCommand.PointsX1.Count; i++)
+                    {
+                        this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.PointsY1[i]);
+                    }
+                }
+                if (CheckVertical.Checked)
+                {
+                    for (int i = 0; i < MyCommand.PointsX2.Count; i++)
+                    {
+                        this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.PointsY2[i]);
+                    }
+                }
+                if (CheckTemperature.Checked)
+                {
+                    for (int i = 0; i < MyCommand.PointsX3.Count; i++)
+                    {
+                        this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.PointsY3[i]);
+                    }
+                }
             }
             
-            for (int i = 0; i < MyCommand.PointsX2.Count; i++)
-            {
-                this.chart1.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.PointsY2[i]);
-            }
-            
-            for (int i = 0; i < MyCommand.PointsX3.Count; i++)
-            {
-                this.chart1.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.PointsY3[i]);
-            }
             #endregion
         }
         private void chart1_MouseWheel(object sender, MouseEventArgs e)
         {
             #region Zoom
-            chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
-            chart1.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            GrafikTable.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            GrafikTable.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
             
             var chart = (System.Windows.Forms.DataVisualization.Charting.Chart)sender;
             var xAxis = chart.ChartAreas[0].AxisX;
@@ -328,6 +383,17 @@ namespace TimeProg
             }
             catch { }
             #endregion
+        }
+        private void button1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                MessageBox.Show("Вы нажали Левую кнопку, координаты курсора - " + e.Location);
+            }
+        }
+        private void chart1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
