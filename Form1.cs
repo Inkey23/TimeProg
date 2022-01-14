@@ -264,17 +264,18 @@ namespace TimeProg
         private void SaveButton_Click(object sender, EventArgs e)
         {
             #region Save
-            var dialog = new OpenFileDialog();
+            var dialog = new SaveFileDialog();
             int LastCount = 0;
-            double Time0 = 0, Point1 = 0, Point2 = 0, Point3 = 20, Rate1 = 0, Rate2 = 0, Rate3 = 0;
-            dialog.Filter = "txt files (*.txt)|*.txt|seq files (*.seq)|*.seq|All files (*.*)|*.*";
+            string Time1, Time2, Time3, Point1, Point2, Point3, Rate1, Rate2, Rate3;
+            dialog.Filter = "txt files (*.txt)|*.txt";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 PathWrite = dialog.FileName;
                 using (StreamWriter SW = new StreamWriter(PathWrite, false, System.Text.Encoding.Default))
                 {
-                    SW.WriteLine("Время(сек):  " + "Позиция горизонтальной пл-ти(град):  " + "Позиция вертикальной пл-ти(град):  " + "Позиция температуры(°С):  "
-                        + "Скорость горизонтальной пл-ти(град/сек):  " + "Скорость вертикальной пл-ти(град/сек):  " + "Скорость изменения температуры(°С/мин):  ");
+                    SW.WriteLine("(AcuitasCyclogram_v1.1_ByKruzhilinIvan)" + "  1_Время1(сек);" + "  2_Позиция горизонтальной пл-ти(град);" + "  3_Скорость горизонтальной пл-ти(град/сек);"
+                        + "    4_Время2(сек);" + "    5_Позиция вертикальной пл-ти(град);" + "    6_Скорость вертикальной пл-ти(град/сек);"
+                        + "      7_Время3(сек);" + "      8_Позиция температуры(°С);" + "      9_Скорость изменения температуры(°С/мин);");
                     if (MaxPoint == 1)
                     {
                         LastCount = MyCommand.PointsX1.Count;
@@ -291,72 +292,87 @@ namespace TimeProg
                     {
                         if (i < MyCommand.PointsX1.Count)
                         {
-                            Time0 = MyCommand.PointsX1[i];
-                        }
-                        else if (i < MyCommand.PointsX2.Count)
-                        {
-                            Time0 = MyCommand.PointsX2[i];
+                            Time1 = Convert.ToString(MyCommand.PointsX1[i]);
                         }
                         else
                         {
-                            Time0 = MyCommand.PointsX3[i];
+                            Time1 = "-";
+                        }
+
+                        if (i < MyCommand.PointsX2.Count)
+                        {
+                            Time2 = Convert.ToString(MyCommand.PointsX2[i]);
+                        }
+                        else
+                        {
+                            Time2 = "-";
+                        }
+
+                        if (i < MyCommand.PointsX3.Count)
+                        {
+                            Time3 = Convert.ToString(MyCommand.PointsX3[i]);
+                        }
+                        else
+                        {
+                            Time3 = "-";
                         }
 
                         if (i < MyCommand.PointsY1.Count)
                         {
-                            Point1 = MyCommand.PointsY1[i];
+                            Point1 = Convert.ToString(MyCommand.PointsY1[i]);
                         }
                         else
                         {
-                            Point1 = 0;
+                            Point1 = "-";
                         }
 
                         if (i < MyCommand.PointsY2.Count)
                         {
-                            Point2 = MyCommand.PointsY2[i];
+                            Point2 = Convert.ToString(MyCommand.PointsY2[i]);
                         }
                         else
                         {
-                            Point2 = 0;
+                            Point2 = "-";
                         }
 
                         if (i < MyCommand.PointsY3.Count)
                         {
-                            Point3 = MyCommand.PointsY3[i];
+                            Point3 = Convert.ToString(MyCommand.PointsY3[i]);
                         }
                         else
                         {
-                            Point3 = 20;
+                            Point3 = "-";
                         }
 
                         if (i < MyCommand.RateY1.Count)
                         {
-                            Rate1 = MyCommand.RateY1[i];
+                            Rate1 = Convert.ToString(MyCommand.RateY1[i]);
                         }
                         else
                         {
-                            Rate1 = 0;
+                            Rate1 = "-";
                         }
 
                         if (i < MyCommand.RateY2.Count)
                         {
-                            Rate2 = MyCommand.RateY2[i];
+                            Rate2 = Convert.ToString(MyCommand.RateY2[i]);
                         }
                         else
                         {
-                            Rate2 = 0;
+                            Rate2 = "-";
                         }
 
                         if (i < MyCommand.RateY3.Count)
                         {
-                            Rate3 = MyCommand.RateY3[i];
+                            Rate3 = Convert.ToString(MyCommand.RateY3[i]);
                         }
                         else
                         {
-                            Rate3 = 0;
+                            Rate3 = "-";
                         }
-                        SW.WriteLine(Time0 + ";  " + Point1 + ";  " + Point2 + ";  " + Point3
-                            + ";  " + Rate1 + ";  " + Rate2 + ";  " + Rate3 + ";");
+                        SW.WriteLine(Time1 + "   " + Point1 + "   " + Rate1 + "               " +
+                            Time2 + "   " + Point2 + "   " + Rate2 + "               " +
+                            Time3 + "   " + Point3 + "   " + Rate3 + "               ");
                     }
 
                 }
@@ -369,6 +385,7 @@ namespace TimeProg
             {
                 MessageBox.Show("В скрипте были обнаружены нестандартные решения, что может привести к ошибкам в построении графика. " +
                     "Причиной являются непрописанные в коде (редкие) команды, или попытка использовать position при ненулевом значении rate. ");
+                MyCommand.ErrorFlag = false;
             }
             GrafikTable.Titles[0].Text = PathRead;
             GrafikTable.ChartAreas[0].AxisX.Minimum = 0;
