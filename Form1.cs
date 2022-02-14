@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using TimeProgClass;
@@ -26,7 +21,7 @@ namespace TimeProg
         string PathRead = "0", InputFile = "0", PathWrite = "0";
         List<double> Time = new List<double>();
         double LastTime;
-        int MaxPoint = 0;
+        int MaxPoint;
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
@@ -161,30 +156,6 @@ namespace TimeProg
                     }
                 }
                 #endregion
-                #region Points processing
-                for (int i = 0; i < MyCommand.PointsX1.Count - 1; i++)
-                {
-                    if (MyCommand.PointsY1[i] - MyCommand.PointsY1[i + 1] > 10000)
-                    {
-                        MyCommand.PointsY1[i + 1] = MyCommand.PointsY1[i + 1] + 11520;
-                    }
-                    else if (MyCommand.PointsY1[i] - MyCommand.PointsY1[i + 1] < -10000)
-                    {
-                        MyCommand.PointsY1[i + 1] = MyCommand.PointsY1[i + 1] - 11520;
-                    }
-                }
-                for (int i = 0; i < MyCommand.PointsX2.Count - 1; i++)
-                {
-                    if (MyCommand.PointsY2[i] - MyCommand.PointsY2[i + 1] > 10000)
-                    {
-                        MyCommand.PointsY2[i + 1] = MyCommand.PointsY2[i + 1] + 11520;
-                    }
-                    else if (MyCommand.PointsY2[i] - MyCommand.PointsY2[i + 1] < -10000)
-                    {
-                        MyCommand.PointsY2[i + 1] = MyCommand.PointsY2[i + 1] - 11520;
-                    }
-                }
-                #endregion
                 #region AddPoints
                 
                 if ((MyCommand.PointsX1[MyCommand.PointsX1.Count - 1] >= MyCommand.PointsX2[MyCommand.PointsX2.Count - 1]) && (MyCommand.PointsX1[MyCommand.PointsX1.Count - 1] >= MyCommand.PointsX3[MyCommand.PointsX3.Count - 1]))
@@ -256,125 +227,147 @@ namespace TimeProg
                     }
                 }
                 */
-                #endregion 
-
-
+                #endregion
+                #region Points processing
+                if (CheckJump.Checked)
+                {
+                    for (int p = 1; p < 40; p++)
+                    {
+                        for (int i = 0; i < MyCommand.PointsX1.Count - 1; i++)
+                        {
+                            if (MyCommand.PointsY1[i] - MyCommand.PointsY1[i + 1] > 11450)
+                            {
+                                MyCommand.PointsY1[i + 1] = MyCommand.PointsY1[i + 1] + 11520;
+                            }
+                            else if (MyCommand.PointsY1[i] - MyCommand.PointsY1[i + 1] < -11450)
+                            {
+                                MyCommand.PointsY1[i + 1] = MyCommand.PointsY1[i + 1] - 11520;
+                            }
+                        }
+                        for (int i = 0; i < MyCommand.PointsX2.Count - 1; i++)
+                        {
+                            if (MyCommand.PointsY2[i] - MyCommand.PointsY2[i + 1] > 11450)
+                            {
+                                MyCommand.PointsY2[i + 1] = MyCommand.PointsY2[i + 1] + 11520;
+                            }
+                            else if (MyCommand.PointsY2[i] - MyCommand.PointsY2[i + 1] < -11450)
+                            {
+                                MyCommand.PointsY2[i + 1] = MyCommand.PointsY2[i + 1] - 11520;
+                            }
+                        }
+                    }
+                }
+                #endregion
             }
         }
         private void SaveButton_Click(object sender, EventArgs e)
         {
             #region Save
             var dialog = new SaveFileDialog();
-            int LastCount = 0;
-            string Time1, Time2, Time3, Point1, Point2, Point3, Rate1, Rate2, Rate3;
             dialog.Filter = "txt files (*.txt)|*.txt";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 PathWrite = dialog.FileName;
+                List<List<double>> SaveMassive = new List<List<double>>();
+                for (int i = 0; i < 7; i++)
+                {
+                    SaveMassive.Add(new List<double>());
+                }
+                SaveMassive[0].Add(0); //Начальное время
+
+                SaveMassive[1].Add(0); //Начальное положение горизонтальной плоскости 
+                SaveMassive[2].Add(0); //Начальное положение вертикальной плоскости
+                SaveMassive[3].Add(20); //Начальное положение температуры
+
+                SaveMassive[4].Add(0); //Началная скорость горизонтальной плоскости
+                SaveMassive[5].Add(0); //Началная скорость вертикальной плоскости
+                SaveMassive[6].Add(0); //Началная скорость изменения температуры
+
+                for (int i = 0; i < MyCommand.PointsX1.Count; i++)
+                {
+                    SaveMassive[0].Add(MyCommand.PointsX1[i]);
+                    SaveMassive[1].Add(MyCommand.PointsY1[i]);
+                    SaveMassive[2].Add(-1);
+                    SaveMassive[3].Add(-1);
+                    SaveMassive[4].Add(MyCommand.RateY1[i]);
+                    SaveMassive[5].Add(-1);
+                    SaveMassive[6].Add(-1);
+                }
+                for (int i = 0; i < MyCommand.PointsX2.Count; i++)
+                {
+                    SaveMassive[0].Add(MyCommand.PointsX2[i]);
+                    SaveMassive[1].Add(-1);
+                    SaveMassive[2].Add(MyCommand.PointsY2[i]);
+                    SaveMassive[3].Add(-1);
+                    SaveMassive[4].Add(-1);
+                    SaveMassive[5].Add(MyCommand.RateY2[i]);
+                    SaveMassive[6].Add(-1);
+                }
+                for (int i = 0; i < MyCommand.PointsX3.Count; i++)
+                {
+                    SaveMassive[0].Add(MyCommand.PointsX3[i]);
+                    SaveMassive[1].Add(-1);
+                    SaveMassive[2].Add(-1);
+                    SaveMassive[3].Add(MyCommand.PointsY3[i]);
+                    SaveMassive[4].Add(-1);
+                    SaveMassive[5].Add(-1);
+                    SaveMassive[6].Add(MyCommand.RateY3[i]);
+                }
+                double[] Temp = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+                for (int i = 1; i < SaveMassive[0].Count - 1; i++)
+                {
+                    for (int j = i + 1; j < SaveMassive[0].Count; j++)
+                    {
+                        if (SaveMassive[0][i] > SaveMassive[0][j])
+                        {
+                            Temp[0] = SaveMassive[0][i];
+                            Temp[1] = SaveMassive[1][i];
+                            Temp[2] = SaveMassive[2][i];
+                            Temp[3] = SaveMassive[3][i];
+                            Temp[4] = SaveMassive[4][i];
+                            Temp[5] = SaveMassive[5][i];
+                            Temp[6] = SaveMassive[6][i];
+                            SaveMassive[0][i] = SaveMassive[0][j];
+                            SaveMassive[1][i] = SaveMassive[1][j];
+                            SaveMassive[2][i] = SaveMassive[2][j];
+                            SaveMassive[3][i] = SaveMassive[3][j];
+                            SaveMassive[4][i] = SaveMassive[4][j];
+                            SaveMassive[5][i] = SaveMassive[5][j];
+                            SaveMassive[6][i] = SaveMassive[6][j];
+                            SaveMassive[0][j] = Temp[0];
+                            SaveMassive[1][j] = Temp[1];
+                            SaveMassive[2][j] = Temp[2];
+                            SaveMassive[3][j] = Temp[3];
+                            SaveMassive[4][j] = Temp[4];
+                            SaveMassive[5][j] = Temp[5];
+                            SaveMassive[6][j] = Temp[6];
+                        }
+                    }
+                }
+
+                for (int i = 1; i < SaveMassive[0].Count; i++)
+                {
+                    for (int j = 1; j < 7; j++)
+                    {
+                        if (SaveMassive[j][i] == -1)
+                        {
+                            SaveMassive[j][i] = SaveMassive[j][i - 1];
+                        }
+                    }
+                }
+                
                 using (StreamWriter SW = new StreamWriter(PathWrite, false, System.Text.Encoding.Default))
                 {
-                    SW.WriteLine("(AcuitasCyclogram_v1.1_ByKruzhilinIvan)" + "  1_Время1(сек);" + "  2_Позиция горизонтальной пл-ти(град);" + "  3_Скорость горизонтальной пл-ти(град/сек);"
-                        + "    4_Время2(сек);" + "    5_Позиция вертикальной пл-ти(град);" + "    6_Скорость вертикальной пл-ти(град/сек);"
-                        + "      7_Время3(сек);" + "      8_Позиция температуры(°С);" + "      9_Скорость изменения температуры(°С/мин);");
-                    if (MaxPoint == 1)
+                    SW.WriteLine("(AcuitasCyclogram_v1.2_ByKruzhilinIvan)" + "  1_Время(сек);" + "  2_Позиция горизонтальной пл-ти(град);" + "  3_Позиция вертикальной пл-ти(град);"
+                        + "  4_Позиция температуры(°С);" + "    5_Скорость горизонтальной пл-ти(град/сек);" + "    6_Скорость вертикальной пл-ти(град/сек);"
+                        + "    7_Скорость изменения температуры(°С/мин);");
+                    
+                    for (int i = 0; i < SaveMassive[0].Count; i++)
                     {
-                        LastCount = MyCommand.PointsX1.Count;
+                        SW.WriteLine(SaveMassive[0][i] + "               "
+                            + SaveMassive[1][i] + "   " + SaveMassive[2][i] + "   " + SaveMassive[3][i] + "               "
+                            + SaveMassive[4][i] + "   " + SaveMassive[5][i] + "   " + SaveMassive[6][i]);
                     }
-                    else if (MaxPoint == 2)
-                    {
-                        LastCount = MyCommand.PointsX2.Count;
-                    }
-                    else if (MaxPoint == 3)
-                    {
-                        LastCount = MyCommand.PointsX3.Count;
-                    }
-                    for (int i = 0; i < LastCount; i++)
-                    {
-                        if (i < MyCommand.PointsX1.Count)
-                        {
-                            Time1 = Convert.ToString(MyCommand.PointsX1[i]);
-                        }
-                        else
-                        {
-                            Time1 = "-";
-                        }
-
-                        if (i < MyCommand.PointsX2.Count)
-                        {
-                            Time2 = Convert.ToString(MyCommand.PointsX2[i]);
-                        }
-                        else
-                        {
-                            Time2 = "-";
-                        }
-
-                        if (i < MyCommand.PointsX3.Count)
-                        {
-                            Time3 = Convert.ToString(MyCommand.PointsX3[i]);
-                        }
-                        else
-                        {
-                            Time3 = "-";
-                        }
-
-                        if (i < MyCommand.PointsY1.Count)
-                        {
-                            Point1 = Convert.ToString(MyCommand.PointsY1[i]);
-                        }
-                        else
-                        {
-                            Point1 = "-";
-                        }
-
-                        if (i < MyCommand.PointsY2.Count)
-                        {
-                            Point2 = Convert.ToString(MyCommand.PointsY2[i]);
-                        }
-                        else
-                        {
-                            Point2 = "-";
-                        }
-
-                        if (i < MyCommand.PointsY3.Count)
-                        {
-                            Point3 = Convert.ToString(MyCommand.PointsY3[i]);
-                        }
-                        else
-                        {
-                            Point3 = "-";
-                        }
-
-                        if (i < MyCommand.RateY1.Count)
-                        {
-                            Rate1 = Convert.ToString(MyCommand.RateY1[i]);
-                        }
-                        else
-                        {
-                            Rate1 = "-";
-                        }
-
-                        if (i < MyCommand.RateY2.Count)
-                        {
-                            Rate2 = Convert.ToString(MyCommand.RateY2[i]);
-                        }
-                        else
-                        {
-                            Rate2 = "-";
-                        }
-
-                        if (i < MyCommand.RateY3.Count)
-                        {
-                            Rate3 = Convert.ToString(MyCommand.RateY3[i]);
-                        }
-                        else
-                        {
-                            Rate3 = "-";
-                        }
-                        SW.WriteLine(Time1 + "   " + Point1 + "   " + Rate1 + "               " +
-                            Time2 + "   " + Point2 + "   " + Rate2 + "               " +
-                            Time3 + "   " + Point3 + "   " + Rate3 + "               ");
-                    }
-
                 }
             }
             #endregion
@@ -389,7 +382,18 @@ namespace TimeProg
             }
             GrafikTable.Titles[0].Text = PathRead;
             GrafikTable.ChartAreas[0].AxisX.Minimum = 0;
-            GrafikTable.ChartAreas[0].AxisX.Title = "Время (сек)";
+            if (CheckMinutes.Checked)
+            {
+                GrafikTable.ChartAreas[0].AxisX.Title = "Время (мин)";
+            }
+            else if (CheckHour.Checked)
+            {
+                GrafikTable.ChartAreas[0].AxisX.Title = "Время (ч)";
+            }
+            else
+            {
+                GrafikTable.ChartAreas[0].AxisX.Title = "Время (сек)";
+            }
 
             #region Drawing
             this.GrafikTable.Series[0].Points.Clear();
@@ -403,21 +407,54 @@ namespace TimeProg
                 {
                     for (int i = 0; i < MyCommand.PointsX1.Count; i++)
                     {
-                        this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.RateY1[i]);
+                        if (CheckMinutes.Checked)
+                        {
+                            this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i]/60, MyCommand.RateY1[i]);
+                        }
+                        else if (CheckHour.Checked)
+                        {
+                            this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i]/3600, MyCommand.RateY1[i]);
+                        }
+                        else
+                        {
+                            this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.RateY1[i]);
+                        }
                     }
                 }
                 if (CheckVertical.Checked)
                 {
                     for (int i = 0; i < MyCommand.PointsX2.Count; i++)
                     {
-                        this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.RateY2[i]);
+                        if (CheckMinutes.Checked)
+                        {
+                            this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i]/60, MyCommand.RateY2[i]);
+                        }
+                        else if (CheckHour.Checked)
+                        {
+                            this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i]/3600, MyCommand.RateY2[i]);
+                        }
+                        else
+                        {
+                            this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.RateY2[i]);
+                        }
                     }
                 }
                 if (CheckTemperature.Checked)
                 {
                     for (int i = 0; i < MyCommand.PointsX3.Count; i++)
                     {
-                        this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.RateY3[i]);
+                        if (CheckMinutes.Checked)
+                        {
+                            this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i]/60, MyCommand.RateY3[i]);
+                        }
+                        else if (CheckHour.Checked)
+                        {
+                            this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i]/3600, MyCommand.RateY3[i]);
+                        }
+                        else
+                        {
+                            this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.RateY3[i]);
+                        }
                     }
                 }
             }
@@ -429,21 +466,54 @@ namespace TimeProg
                 {
                     for (int i = 0; i < MyCommand.PointsX1.Count; i++)
                     {
-                        this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.PointsY1[i]);
+                        if (CheckMinutes.Checked)
+                        {
+                            this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i]/60, MyCommand.PointsY1[i]);
+                        }
+                        else if (CheckHour.Checked)
+                        {
+                            this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i]/3600, MyCommand.PointsY1[i]);
+                        }
+                        else
+                        {
+                            this.GrafikTable.Series[0].Points.AddXY(MyCommand.PointsX1[i], MyCommand.PointsY1[i]);
+                        }
                     }
                 }
                 if (CheckVertical.Checked)
                 {
                     for (int i = 0; i < MyCommand.PointsX2.Count; i++)
                     {
-                        this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.PointsY2[i]);
+                        if (CheckMinutes.Checked)
+                        {
+                            this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i]/60, MyCommand.PointsY2[i]);
+                        }
+                        else if (CheckHour.Checked)
+                        {
+                            this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i]/3600, MyCommand.PointsY2[i]);
+                        }
+                        else
+                        {
+                            this.GrafikTable.Series[1].Points.AddXY(MyCommand.PointsX2[i], MyCommand.PointsY2[i]);
+                        }
                     }
                 }
                 if (CheckTemperature.Checked)
                 {
                     for (int i = 0; i < MyCommand.PointsX3.Count; i++)
                     {
-                        this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.PointsY3[i]);
+                        if (CheckMinutes.Checked)
+                        {
+                            this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i]/60, MyCommand.PointsY3[i]);
+                        }
+                        else if (CheckHour.Checked)
+                        {
+                            this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i]/3600, MyCommand.PointsY3[i]);
+                        }
+                        else
+                        {
+                            this.GrafikTable.Series[2].Points.AddXY(MyCommand.PointsX3[i], MyCommand.PointsY3[i]);
+                        }
                     }
                 }
             }

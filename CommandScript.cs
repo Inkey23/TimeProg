@@ -1,24 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
-using TimeProgClass;
 
 
 namespace TimeProgClass
-{   //(Важные)  Выгрузка - время, позиция, скорость, ускорение.         
-    //(Средние) Вывод ошибок на экран. 
-    //(Не важные) Возможность переключения времени часы/минуты/секунды. Исключить команду WAIT?? Добавить галочку учета 5760? Возможность менять частоту построения с 1сек на другое???
+{   //(Важные)  Выгрузка - общую ось времени.     
+    //(Средние) Возможность менять частоту построения с 1сек на другое??? Добавить прокрутку 2 оси. 
+    //(Бесполезные) Вывод ошибок на экран.  
     public class CommandClass
     {
         public int Case = 0;
-        public bool OSCflag = false, ErrorFlag = false;
+        public bool OSCflag = false, ErrorFlag = false, Inversion = false;
         public double S = 0, V = 0, A = 0, AbsolutTime = 0, NewPos = 0, J = 0;
         public double[] LastRate = new double[] { 0, 0 };
         public double[] RealRate = new double[] { 0, 0 };
@@ -51,6 +42,11 @@ namespace TimeProgClass
                 V = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
                 A = Math.Abs(Convert.ToDouble(FileSplit[i + 5]));
                 S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition[Case]);
+                if (S > 5760)
+                {
+                    Inversion = true;
+                    S = 11520 - S;
+                }
                 RealPosition[Case] = LastPosition[Case];
                 LastPosition[Case] = Convert.ToDouble(FileSplit[i + 3]);
                 if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
@@ -58,18 +54,45 @@ namespace TimeProgClass
                     TimePos[Case] = Math.Sqrt(2 * S / A);
                     for (int j = 0; j < TimePos[Case]; j++)
                     {
-
-                        if (RealPosition[Case] <= LastPosition[Case])
+                        if ((RealPosition[Case] - A * j * j / 2) < -5760 && Inversion == true)
                         {
-                            ActivePointsX.Add(AbsolutTime + j);
-                            ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
-                            ActiveRateY.Add(A * j);
+                            Inversion = false;
+                            RealPosition[Case] += 11520;
+                        }
+                        else if ((RealPosition[Case] + A * j * j / 2) > 5760 && Inversion == true)
+                        {
+                            Inversion = false;
+                            RealPosition[Case] -= 11520;
+                        }
+                        if (Inversion == false)
+                        {
+                            if (RealPosition[Case] <= LastPosition[Case])
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                                ActiveRateY.Add(A * j);
+                            }
+                            else
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                                ActiveRateY.Add(-A * j);
+                            }
                         }
                         else
                         {
-                            ActivePointsX.Add(AbsolutTime + j);
-                            ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
-                            ActiveRateY.Add(-A * j);
+                            if (RealPosition[Case] <= LastPosition[Case])
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                                ActiveRateY.Add(-A * j);
+                            }
+                            else
+                            {
+                                ActivePointsX.Add(AbsolutTime + j);
+                                ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                                ActiveRateY.Add(A * j);
+                            }
                         }
 
                     }
@@ -81,39 +104,99 @@ namespace TimeProgClass
                     {
                         if (A * j <= V)
                         {
-                            if (RealPosition[Case] <= LastPosition[Case])
+                            if ((RealPosition[Case] - A * j * j / 2) < -5760 && Inversion == true)
                             {
-                                ActivePointsX.Add(AbsolutTime + j);
-                                ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
-                                ActiveRateY.Add(A * j);
-                                NewPos = RealPosition[Case] + A * j * j / 2;
-                                J = j;
+                                Inversion = false;
+                                RealPosition[Case] += 11520;
+                            }
+                            else if ((RealPosition[Case] + A * j * j / 2) > 5760 && Inversion == true)
+                            {
+                                Inversion = false;
+                                RealPosition[Case] -= 11520;
+                            }
+                            if (Inversion == false)
+                            {
+                                if (RealPosition[Case] <= LastPosition[Case])
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                                    ActiveRateY.Add(A * j);
+                                    NewPos = RealPosition[Case] + A * j * j / 2;
+                                    J = j;
+                                }
+                                else
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                                    ActiveRateY.Add(-A * j);
+                                    NewPos = RealPosition[Case] - A * j * j / 2;
+                                    J = j;
+                                }
                             }
                             else
                             {
-                                ActivePointsX.Add(AbsolutTime + j);
-                                ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
-                                ActiveRateY.Add(-A * j);
-                                NewPos = RealPosition[Case] - A * j * j / 2;
-                                J = j;
+                                if (RealPosition[Case] <= LastPosition[Case])
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(RealPosition[Case] - A * j * j / 2);
+                                    ActiveRateY.Add(-A * j);
+                                    NewPos = RealPosition[Case] - A * j * j / 2;
+                                    J = j;
+                                }
+                                else
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(RealPosition[Case] + A * j * j / 2);
+                                    ActiveRateY.Add(A * j);
+                                    NewPos = RealPosition[Case] + A * j * j / 2;
+                                    J = j;
+                                }
                             }
-
                         }
                         else
                         {
-                            if (RealPosition[Case] <= LastPosition[Case])
+                            if ((NewPos - V * (j - J)) < -5760 && Inversion == true)
                             {
-                                ActivePointsX.Add(AbsolutTime + j);
-                                ActivePointsY.Add(NewPos + V * (j - J));
-                                ActiveRateY.Add(V);
+                                Inversion = false;
+                                NewPos += 11520;
+                            }
+                            else if ((NewPos + V * (j - J)) > 5760 && Inversion == true)
+                            {
+                                Inversion = false;
+                                NewPos -= 11520;
+                            }
+                            if (Inversion == false)
+                            {
+                                //if (RealPosition[Case] <= LastPosition[Case])
+                                if (NewPos <= LastPosition[Case])
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(NewPos + V * (j - J));
+                                    ActiveRateY.Add(V);
+                                }
+                                else
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(NewPos - V * (j - J));
+                                    ActiveRateY.Add(-V);
+                                }
                             }
                             else
                             {
-                                ActivePointsX.Add(AbsolutTime + j);
-                                ActivePointsY.Add(NewPos - V * (j - J));
-                                ActiveRateY.Add(-V);
+                                //if (RealPosition[Case] > LastPosition[Case])
+                                if (NewPos > LastPosition[Case])
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(NewPos + V * (j - J));
+                                    ActiveRateY.Add(V);
+                                }
+                                else
+                                {
+                                    ActivePointsX.Add(AbsolutTime + j);
+                                    ActivePointsY.Add(NewPos - V * (j - J));
+                                    ActiveRateY.Add(-V);
+                                }
                             }
-
                         }
                     }
                 }
@@ -135,6 +218,7 @@ namespace TimeProgClass
                 ActivePointsX.Clear();
                 ActivePointsY.Clear();
                 ActiveRateY.Clear();
+                Inversion = false;
             }
             else
             {

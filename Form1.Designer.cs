@@ -44,6 +44,9 @@ namespace TimeProg
             this.CheckVertical = new System.Windows.Forms.CheckBox();
             this.CheckTemperature = new System.Windows.Forms.CheckBox();
             this.CheckZoom = new System.Windows.Forms.CheckBox();
+            this.CheckMinutes = new System.Windows.Forms.CheckBox();
+            this.CheckHour = new System.Windows.Forms.CheckBox();
+            this.CheckJump = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.GrafikTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -126,7 +129,7 @@ namespace TimeProg
             this.GrafikTable.Text = "GrafikTable";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             title1.Name = "Title1";
-            title1.Text = "Циклограмма v1.1";
+            title1.Text = "Циклограмма v1.2";
             title1.TextStyle = System.Windows.Forms.DataVisualization.Charting.TextStyle.Shadow;
             this.GrafikTable.Titles.Add(title1);
             this.GrafikTable.Click += new System.EventHandler(this.chart1_Click);
@@ -192,11 +195,47 @@ namespace TimeProg
             this.CheckZoom.Text = "Режим масшатабирования кнопками мыши";
             this.CheckZoom.UseVisualStyleBackColor = true;
             // 
+            // CheckMinutes
+            // 
+            this.CheckMinutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckMinutes.AutoSize = true;
+            this.CheckMinutes.Location = new System.Drawing.Point(1241, 323);
+            this.CheckMinutes.Name = "CheckMinutes";
+            this.CheckMinutes.Size = new System.Drawing.Size(146, 17);
+            this.CheckMinutes.TabIndex = 10;
+            this.CheckMinutes.Text = "Ось времени в минутах";
+            this.CheckMinutes.UseVisualStyleBackColor = true;
+            // 
+            // CheckHour
+            // 
+            this.CheckHour.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckHour.AutoSize = true;
+            this.CheckHour.Location = new System.Drawing.Point(1241, 346);
+            this.CheckHour.Name = "CheckHour";
+            this.CheckHour.Size = new System.Drawing.Size(133, 17);
+            this.CheckHour.TabIndex = 11;
+            this.CheckHour.Text = "Ось времени в часах";
+            this.CheckHour.UseVisualStyleBackColor = true;
+            // 
+            // CheckJump
+            // 
+            this.CheckJump.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckJump.AutoSize = true;
+            this.CheckJump.Location = new System.Drawing.Point(1241, 369);
+            this.CheckJump.Name = "CheckJump";
+            this.CheckJump.Size = new System.Drawing.Size(209, 30);
+            this.CheckJump.TabIndex = 12;
+            this.CheckJump.Text = "Убрать скачок на 5760 \r\n(необходимо перезагрузить скрипт)";
+            this.CheckJump.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1496, 678);
+            this.Controls.Add(this.CheckJump);
+            this.Controls.Add(this.CheckHour);
+            this.Controls.Add(this.CheckMinutes);
             this.Controls.Add(this.CheckZoom);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.Grafik1);
@@ -207,7 +246,7 @@ namespace TimeProg
             this.Controls.Add(this.CheckRate);
             this.Controls.Add(this.GrafikTable);
             this.Name = "Form1";
-            this.Text = "AcuitasCyclogram_v1.1";
+            this.Text = "AcuitasCyclogram_v1.2";
             ((System.ComponentModel.ISupportInitialize)(this.GrafikTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -225,6 +264,9 @@ namespace TimeProg
         private System.Windows.Forms.CheckBox CheckTemperature;
         public System.Windows.Forms.DataVisualization.Charting.Chart GrafikTable;
         private System.Windows.Forms.CheckBox CheckZoom;
+        private System.Windows.Forms.CheckBox CheckMinutes;
+        private System.Windows.Forms.CheckBox CheckHour;
+        private System.Windows.Forms.CheckBox CheckJump;
     }
 }
 
