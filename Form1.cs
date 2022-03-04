@@ -173,6 +173,10 @@ namespace TimeProg
                     LastTime = MyCommand.PointsX3[MyCommand.PointsX3.Count - 1];
                     MaxPoint = 3;
                 }
+                if (MyCommand.AbsolutTime > LastTime)
+                {
+                    LastTime = MyCommand.AbsolutTime;
+                }
                 MyCommand.PointsX1.Add(LastTime);
                 MyCommand.PointsY1.Add(MyCommand.LastPosition[0]);
                 MyCommand.RateY1.Add(0);

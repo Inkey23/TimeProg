@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using System.Windows.Forms;
+using System.IO;
+using TimeProgClass;
 
 
 namespace TimeProgClass
-{   //(Важные)  Выгрузка - общую ось времени.     
-    //(Средние) Возможность менять частоту построения с 1сек на другое??? Добавить прокрутку 2 оси. 
+{   //(Важные) Добавить возможность вводить дату и время. Возможность менять частоту построения с 1сек на другое (иногда возникают неточности из-за малого количества точек)? 
+    //(Средние) Добавить прокрутку 2 оси. Округлять время. Оптимизировать сортировку при выгрузке времени. Показывать положение и скорость одновременно?
     //(Бесполезные) Вывод ошибок на экран.  
     public class CommandClass
     {
+        IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
         public int Case = 0;
         public bool OSCflag = false, ErrorFlag = false, Inversion = false;
         public double S = 0, V = 0, A = 0, AbsolutTime = 0, NewPos = 0, J = 0;
@@ -39,16 +45,44 @@ namespace TimeProgClass
             Case = Convert.ToInt32(FileSplit[i + 2]) - 1;
             if (LastRate[Case] == 0)
             {
-                V = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
-                A = Math.Abs(Convert.ToDouble(FileSplit[i + 5]));
-                S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition[Case]);
+                try
+                {
+                    V = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
+                }
+                catch
+                {
+                    V = Math.Abs(double.Parse(FileSplit[i + 4], formatter));
+                }
+                try
+                {
+                    A = Math.Abs(Convert.ToDouble(FileSplit[i + 5]));
+                }
+                catch
+                {
+                    A = Math.Abs(double.Parse(FileSplit[i + 5], formatter));
+                }
+                try
+                {
+                    S = Math.Abs(Convert.ToDouble(FileSplit[i + 3]) - LastPosition[Case]);
+                }
+                catch
+                {
+                    S = Math.Abs(double.Parse(FileSplit[i + 3], formatter) - LastPosition[Case]);
+                }
                 if (S > 5760)
                 {
                     Inversion = true;
                     S = 11520 - S;
                 }
                 RealPosition[Case] = LastPosition[Case];
-                LastPosition[Case] = Convert.ToDouble(FileSplit[i + 3]);
+                try
+                {
+                    LastPosition[Case] = Convert.ToDouble(FileSplit[i + 3]);
+                }
+                catch
+                {
+                    LastPosition[Case] = double.Parse(FileSplit[i + 3], formatter);
+                }
                 if (S <= (V * V / (2 * A)))     //Если движение только равноускоренное
                 {
                     TimePos[Case] = Math.Sqrt(2 * S / A);
@@ -229,9 +263,23 @@ namespace TimeProgClass
         public void DemRATe(string[] FileSplit, int i)
         {
             Case = Convert.ToInt32(FileSplit[i + 2]) - 1;
-            A = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
+            try
+            {
+                A = Math.Abs(Convert.ToDouble(FileSplit[i + 4]));
+            }
+            catch
+            {
+                A = Math.Abs(double.Parse(FileSplit[i + 4], formatter));
+            }
             RealRate[Case] = LastRate[Case];
-            LastRate[Case] = Convert.ToDouble(FileSplit[i + 3]);
+            try
+            {
+                LastRate[Case] = Convert.ToDouble(FileSplit[i + 3]);
+            }
+            catch
+            {
+                LastRate[Case] = double.Parse(FileSplit[i + 3], formatter);
+            }
             TimeRate[Case] = (LastRate[Case] - RealRate[Case]) / A;
             for (int j = 0; j < TimeRate[Case]; j++)
             {
@@ -283,10 +331,31 @@ namespace TimeProgClass
         }
         public void DemTEMP(string[] FileSplit, int i)
         {
-            V = Math.Abs(Convert.ToDouble(FileSplit[i + 3])) / 60;
-            S = Math.Abs(Convert.ToDouble(FileSplit[i + 2]) - LastPosition[2]);
+            try
+            {
+                V = Math.Abs(Convert.ToDouble(FileSplit[i + 3])) / 60;
+            }
+            catch
+            {
+                V = Math.Abs(double.Parse(FileSplit[i + 3], formatter)) / 60;
+            }
+            try
+            {
+                S = Math.Abs(Convert.ToDouble(FileSplit[i + 2]) - LastPosition[2]);
+            }
+            catch
+            {
+                S = Math.Abs(double.Parse(FileSplit[i + 2], formatter) - LastPosition[2]);
+            }
             RealPosition[2] = LastPosition[2];
-            LastPosition[2] = Convert.ToDouble(FileSplit[i + 2]);
+            try
+            {
+                LastPosition[2] = Convert.ToDouble(FileSplit[i + 2]);
+            }
+            catch
+            {
+                LastPosition[2] = double.Parse(FileSplit[i + 2], formatter);
+            }
             TimePos[2] = S / V;
             for (int j = 0; j < TimePos[2]; j++)
             {

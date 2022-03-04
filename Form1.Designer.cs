@@ -129,7 +129,7 @@ namespace TimeProg
             this.GrafikTable.Text = "GrafikTable";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             title1.Name = "Title1";
-            title1.Text = "Циклограмма v1.2";
+            title1.Text = "Циклограмма v1.3";
             title1.TextStyle = System.Windows.Forms.DataVisualization.Charting.TextStyle.Shadow;
             this.GrafikTable.Titles.Add(title1);
             this.GrafikTable.Click += new System.EventHandler(this.chart1_Click);
@@ -246,7 +246,7 @@ namespace TimeProg
             this.Controls.Add(this.CheckRate);
             this.Controls.Add(this.GrafikTable);
             this.Name = "Form1";
-            this.Text = "AcuitasCyclogram_v1.2";
+            this.Text = "AcuitasCyclogram_v1.3";
             ((System.ComponentModel.ISupportInitialize)(this.GrafikTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
